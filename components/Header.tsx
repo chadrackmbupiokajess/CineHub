@@ -203,6 +203,11 @@ const Header: React.FC = () => {
                 </div>
               )}
             </form>
+
+            {/* Avatar (Desktop Only) */}
+            <div className="hidden lg:flex w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors cursor-pointer items-center justify-center flex-shrink-0">
+              <span className="text-white font-bold text-lg">👤</span>
+            </div>
           </div>
 
           {/* Hamburger Menu + Avatar (Mobile/Tablet) - RIGHT */}

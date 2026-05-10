@@ -28,7 +28,7 @@ export default function ClientLayoutWrapper({
   return (
     <body className={`min-h-full flex flex-col bg-gray-100 text-gray-900 ${geistSans.variable} ${geistMono.variable} antialiased`}>
       {!isWatchPage && <Header />}
-      <main className={`flex-1 ${!isWatchPage ? 'pt-20 lg:pt-16' : ''}`}>
+      <main className={`flex-1 ${!isWatchPage ? 'pt-12 lg:pt-16' : ''}`}>
         {children}
       </main>
       {!isWatchPage && <Footer />}
