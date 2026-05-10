@@ -32,7 +32,9 @@ const Header: React.FC = () => {
   };
 
   const handleFilterClick = (filter: string) => {
-    if (filter === "films") {
+    if (filter === "all") { // New filter for "Tous"
+      router.push("/"); // Navigate to home without any type parameter
+    } else if (filter === "films") {
       router.push("/?type=movie");
     } else if (filter === "series") {
       router.push("/?type=tv");
@@ -46,21 +48,27 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 w-full bg-gray-900 text-white p-4 shadow-md z-50"> {/* Added fixed, top-0, w-full, z-50 */}
+    <header className="fixed top-0 w-full bg-gray-900 text-white p-4 shadow-md z-50">
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors mr-8">
           <Image
-            src="/logo.png" // Updated to logo.png
+            src="/logo.png"
             alt="CineHub Logo"
-            width={120} // Adjust width as needed
-            height={40} // Adjust height as needed
-            priority // Prioritize loading for LCP
+            width={120}
+            height={40}
+            priority
           />
         </Link>
 
         {/* Left Filters */}
         <nav className="flex items-center space-x-6 flex-1">
+          <button
+            onClick={() => handleFilterClick("all")} // New "Tous" button
+            className="hover:text-red-400 transition-colors font-medium"
+          >
+            Tous
+          </button>
           <button
             onClick={() => handleFilterClick("films")}
             className="hover:text-red-400 transition-colors font-medium"
