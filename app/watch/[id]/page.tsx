@@ -46,13 +46,13 @@ export default function WatchMoviePage() {
 
   return (
     <div
-      className="w-screen h-screen bg-black relative" // Added relative for absolute positioning of button
+      className="w-screen h-screen bg-black relative"
       onMouseEnter={() => setShowBackButton(true)}
       onMouseLeave={() => setShowBackButton(false)}
     >
       <iframe
         src={vidsrcUrl}
-        allowFullScreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" // Expanded allow permissions
         frameBorder="0"
         className="w-full h-full"
         title={`Watch movie ${movieId}`}
@@ -60,9 +60,9 @@ export default function WatchMoviePage() {
 
       {/* Back Button */}
       <button
-        onClick={() => router.back()} // Use router.back() for navigation
+        onClick={() => router.back()}
         className={`absolute top-4 left-4 p-3 bg-gray-800 bg-opacity-75 rounded-full text-white transition-opacity duration-300 z-50
-          ${showBackButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} // Hide by default, show on hover
+          ${showBackButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         aria-label="Retour"
       >
         <svg
