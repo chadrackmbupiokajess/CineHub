@@ -38,8 +38,8 @@ export async function fetchMovies(endpoint: string, params?: Record<string, stri
   }
 }
 
-export async function getPopularMovies() {
-  return fetchMovies("/movie/popular");
+export async function getPopularMovies(page: number = 1) {
+  return fetchMovies("/movie/popular", { page: page.toString() });
 }
 
 export async function getMovieDetails(id: number) {
@@ -58,8 +58,8 @@ export async function getSimilarMovies(id: number) {
   return fetchMovies(`/movie/${id}/similar`);
 }
 
-export async function searchMovies(query: string) {
-  return fetchMovies("/search/movie", { query });
+export async function searchMovies(query: string, page: number = 1) {
+  return fetchMovies("/search/movie", { query, page: page.toString() });
 }
 
 export async function getTrending(mediaType: "all" | "movie" | "tv" = "all", timeWindow: "day" | "week" = "week") {
@@ -67,12 +67,12 @@ export async function getTrending(mediaType: "all" | "movie" | "tv" = "all", tim
 }
 
 // New functions for filtering
-export async function getPopularTvShows() {
-  return fetchMovies("/tv/popular");
+export async function getPopularTvShows(page: number = 1) {
+  return fetchMovies("/tv/popular", { page: page.toString() });
 }
 
-export async function getUpcomingMovies() {
-  return fetchMovies("/movie/upcoming");
+export async function getUpcomingMovies(page: number = 1) {
+  return fetchMovies("/movie/upcoming", { page: page.toString() });
 }
 
 export async function getGenres(mediaType: "movie" | "tv" = "movie") {

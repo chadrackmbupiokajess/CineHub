@@ -22,6 +22,18 @@ interface HeroCarouselProps {
 const HeroCarousel: React.FC<HeroCarouselProps> = ({ items }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Format date as "Mercredi, 30/03/2025"
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    const days = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+    const dayName = days[date.getUTCDay()];
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const year = date.getUTCFullYear();
+    return `${dayName}, ${day}/${month}/${year}`;
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length);
@@ -69,7 +81,7 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ items }) => {
         <div className="flex items-center gap-4 mb-8">
           {releaseDate && (
             <span className="text-sm md:text-base bg-red-600 px-3 py-1 rounded-full font-semibold">
-              {new Date(releaseDate).getFullYear()}
+              {formatDate(releaseDate)}
             </span>
           )}
           <Link href={detailsPath} className="inline-flex items-center px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-colors duration-200 shadow-lg">

@@ -3,14 +3,14 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import MovieCard from "./MovieCard";
 
-interface InfiniteMovieListProps {
+interface InfiniteSearchListProps {
   initialItems: any[];
-  filterType?: string;
+  query: string;
 }
 
-const InfiniteMovieList: React.FC<InfiniteMovieListProps> = ({ 
+const InfiniteSearchList: React.FC<InfiniteSearchListProps> = ({ 
   initialItems, 
-  filterType
+  query 
 }) => {
   const [items, setItems] = useState(initialItems);
   const [page, setPage] = useState(1);
@@ -19,12 +19,11 @@ const InfiniteMovieList: React.FC<InfiniteMovieListProps> = ({
   const observerTarget = useRef(null);
 
   const loadMore = useCallback(async () => {
-    if (isLoading || !hasMore) return;
+    if (isLoading || !hasMore || !query) return;
 
     setIsLoading(true);
     try {
-      const type = filterType || "movie";
-      const response = await fetch(`/api/movies?type=${type}&page=${page + 1}`);
+      const response = await fetch(`/api/search?query=${encodeURIComponent(query)}&page=${page + 1}`);
       const newItems = await response.json();
       
       if (newItems.length === 0) {
@@ -38,7 +37,7 @@ const InfiniteMovieList: React.FC<InfiniteMovieListProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [page, isLoading, hasMore, filterType]);
+  }, [page, isLoading, hasMore, query]);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -57,6 +56,14 @@ const InfiniteMovieList: React.FC<InfiniteMovieListProps> = ({
       }
     };
   }, [loadMore, hasMore, isLoading]);
+
+  if (items.length === 0) {
+    return (
+      <p className="text-center text-lg text-gray-600 dark:text-gray-400">
+        Aucun film trouvé pour votre recherche.
+      </p>
+    );
+  }
 
   return (
     <>
@@ -79,4 +86,4 @@ const InfiniteMovieList: React.FC<InfiniteMovieListProps> = ({
   );
 };
 
-export default InfiniteMovieList;
+export default InfiniteSearchList;

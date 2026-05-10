@@ -1,14 +1,15 @@
 import { searchMovies } from "../../lib/tmdb";
-import MovieCard from "../../components/MovieCard";
+import InfiniteSearchList from "../../components/InfiniteSearchList";
 
 interface SearchPageProps {
-  searchParams: {
+  searchParams: Promise<{
     query?: string;
-  };
+  }>;
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.query;
+  const params = await searchParams;
+  const query = params.query;
   let movies = [];
 
   if (query) {
@@ -21,16 +22,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <h1 className="text-3xl font-bold mb-6 text-center">
         {query ? `Résultats de recherche pour "${query}"` : "Rechercher des films"}
       </h1>
-      {query && movies.length === 0 && (
+      {query && (
+        <InfiniteSearchList initialItems={movies} query={query} />
+      )}
+      {!query && (
         <p className="text-center text-lg text-gray-600 dark:text-gray-400">
-          Aucun film trouvé pour votre recherche.
+          Veuillez entrer une recherche.
         </p>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {movies.map((movie: any) => (
-          <MovieCard key={movie.id} movie={movie} />
-        ))}
-      </div>
     </div>
   );
 }

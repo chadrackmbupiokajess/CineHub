@@ -1,6 +1,6 @@
 import { getPopularMovies, getTrending, getPopularTvShows, getUpcomingMovies, getMoviesByGenre } from "../lib/tmdb";
-import MovieCard from "../components/MovieCard";
 import HeroCarousel from "../components/HeroCarousel";
+import InfiniteMovieList from "../components/InfiniteMovieList";
 
 interface HomePageProps {
   searchParams: Promise<{
@@ -59,12 +59,10 @@ export default async function Home({ searchParams }: HomePageProps) {
       {/* Display Section */}
       <div className="container mx-auto p-4 mt-8">
         <h1 className="text-3xl font-bold mb-6 text-center">{sectionTitle}</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {displayItems.map((item: any) => (
-            // Corrected: pass 'item' prop instead of 'movie'
-            <MovieCard key={item.id} item={item} />
-          ))}
-        </div>
+        <InfiniteMovieList 
+          initialItems={displayItems}
+          filterType={filterType}
+        />
       </div>
     </div>
   );
