@@ -10,18 +10,19 @@ const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const searchInputRef = useRef<HTMLInputElement>(null); // Ref for the search input
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Debounce logic for fetching suggestions
   useEffect(() => {
     const handler = setTimeout(async () => {
       const trimmedQuery = searchQuery.trim();
-      if (trimmedQuery.length > 2) { // Only fetch suggestions if query is at least 3 characters
+      if (trimmedQuery.length > 2) {
         try {
           const data = await searchMovies(trimmedQuery);
-          setSuggestions(data.results.slice(0, 5)); // Limit to top 5 suggestions
+          setSuggestions(data.results.slice(0, 5));
           setShowSuggestions(true);
         } catch (error) {
           console.error("Error fetching suggestions:", error);
@@ -32,47 +33,43 @@ const Header: React.FC = () => {
         setSuggestions([]);
         setShowSuggestions(false);
       }
-    }, 300); // 300ms debounce delay for suggestions
+    }, 300);
 
     return () => {
       clearTimeout(handler);
     };
   }, [searchQuery]);
 
-  // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  // Handle form submission (Enter key or click on search icon)
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedQuery = searchQuery.trim();
     if (trimmedQuery) {
       router.push(`/search?query=${encodeURIComponent(trimmedQuery)}`);
-      setShowSuggestions(false); // Hide suggestions after full search
+      setShowSuggestions(false);
     } else if (pathname === '/search') {
       router.push('/');
-      setShowSuggestions(false); // Hide suggestions
+      setShowSuggestions(false);
     }
+    setMenuOpen(false);
   };
 
-  // Handle click on a suggestion
   const handleSuggestionClick = (suggestionTitle: string) => {
     setSearchQuery(suggestionTitle);
     router.push(`/search?query=${encodeURIComponent(suggestionTitle)}`);
-    setShowSuggestions(false); // Hide suggestions
+    setShowSuggestions(false);
+    setMenuOpen(false);
   };
 
-  // Hide suggestions when clicking outside the input and suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Check if the click is outside the input and the suggestions dropdown
       if (searchInputRef.current && !searchInputRef.current.contains(event.target as Node)) {
-        // Also check if the click is outside the suggestions dropdown itself
         const suggestionsDropdown = document.getElementById('suggestions-dropdown');
         if (suggestionsDropdown && suggestionsDropdown.contains(event.target as Node)) {
-          return; // Don't hide if clicking on a suggestion
+          return;
         }
         setShowSuggestions(false);
       }
@@ -82,7 +79,6 @@ const Header: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
 
   const handleFilterClick = (filter: string) => {
     if (filter === "all") {
@@ -98,76 +94,186 @@ const Header: React.FC = () => {
     } else if (filter === "maliste") {
       router.push("/watchlist");
     }
-    setShowSuggestions(false); // Hide suggestions when clicking a filter
+    setShowSuggestions(false);
+    setMenuOpen(false);
   };
 
   return (
     <header className="fixed top-0 w-full bg-gray-900 text-white p-4 shadow-md z-50">
-      <div className="container mx-auto flex flex-wrap justify-center sm:flex-row sm:justify-between items-center gap-4">
-        {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors sm:mr-8">
-          <Image
-            src="/logo.png"
-            alt="CineHub Logo"
-            width={120}
-            height={40}
-            priority
-          />
-        </Link>
+      <div className="container mx-auto">
+        {/* Top Row: Logo | Menu/Filters, Search, Profile, Hamburger+Avatar */}
+        <div className="flex justify-between items-center gap-4">
+          {/* Logo */}
+          <Link href="/" className="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors flex-shrink-0">
+            <Image
+              src="/logo.png"
+              alt="CineHub Logo"
+              width={120}
+              height={40}
+              priority
+            />
+          </Link>
 
-        {/* Left Filters */}
-        <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2 sm:flex-nowrap sm:space-x-6 sm:flex-1">
+          {/* Desktop Menu (always visible on lg+) */}
+          <nav className="hidden lg:flex gap-6 flex-1 items-center ml-8">
+            <button
+              onClick={() => handleFilterClick("all")}
+              className="hover:text-red-400 transition-colors font-medium"
+            >
+              Tous
+            </button>
+            <button
+              onClick={() => handleFilterClick("films")}
+              className="hover:text-red-400 transition-colors font-medium"
+            >
+              Film
+            </button>
+            <button
+              onClick={() => handleFilterClick("series")}
+              className="hover:text-red-400 transition-colors font-medium"
+            >
+              Série
+            </button>
+            <button
+              onClick={() => handleFilterClick("nouveaute")}
+              className="hover:text-red-400 transition-colors font-medium"
+            >
+              Nouveauté
+            </button>
+            <button
+              onClick={() => handleFilterClick("documentaire")}
+              className="hover:text-red-400 transition-colors font-medium"
+            >
+              Documentaire
+            </button>
+            <button
+              onClick={() => handleFilterClick("maliste")}
+              className="hover:text-red-400 transition-colors font-medium"
+            >
+              Ma liste
+            </button>
+          </nav>
+
+          {/* Center/Right Section: Search and Profile */}
+          <div className="flex items-center gap-4 flex-shrink-0">
+            {/* Search Form */}
+            <form onSubmit={handleSearchSubmit} className="relative hidden sm:block">
+              <input
+                id="search-input"
+                type="text"
+                value={searchQuery}
+                onChange={handleInputChange}
+                placeholder="Rechercher..."
+                className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-48 lg:w-64"
+                ref={searchInputRef}
+                onFocus={() => searchQuery.trim().length > 2 && suggestions.length > 0 && setShowSuggestions(true)}
+              />
+              <button
+                type="submit"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-white hover:text-red-400 transition-colors"
+                aria-label="Rechercher"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </button>
+
+              {/* Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div id="suggestions-dropdown" className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
+                  {suggestions.map((suggestion) => (
+                    <div
+                      key={suggestion.id}
+                      className="p-2 cursor-pointer hover:bg-gray-700 text-white truncate text-sm"
+                      onClick={() => handleSuggestionClick(suggestion.title || suggestion.name)}
+                    >
+                      {suggestion.title || suggestion.name} ({suggestion.release_date?.substring(0, 4) || suggestion.first_air_date?.substring(0, 4)})
+                    </div>
+                  ))}
+                </div>
+              )}
+            </form>
+          </div>
+
+          {/* Hamburger Menu + Avatar (Mobile/Tablet) - RIGHT */}
+          <div className="lg:hidden flex items-center gap-2">
+            {/* Avatar */}
+            <div className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors cursor-pointer flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-bold text-lg">👤</span>
+            </div>
+            
+            {/* Hamburger Button */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex flex-col gap-1.5 p-2"
+              aria-label="Menu"
+            >
+              <span className={`w-6 h-0.5 bg-white transition-transform ${menuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+              <span className={`w-6 h-0.5 bg-white transition-opacity ${menuOpen ? 'opacity-0' : ''}`}></span>
+              <span className={`w-6 h-0.5 bg-white transition-transform ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu Navigation (Collapsible) */}
+        <nav className={`lg:hidden mt-4 ${menuOpen ? 'flex flex-col gap-2 pt-4 border-t border-gray-700' : 'hidden'}`}>
           <button
             onClick={() => handleFilterClick("all")}
-            className="hover:text-red-400 transition-colors font-medium"
+            className="hover:text-red-400 transition-colors font-medium text-left py-2"
           >
             Tous
           </button>
           <button
             onClick={() => handleFilterClick("films")}
-            className="hover:text-red-400 transition-colors font-medium"
+            className="hover:text-red-400 transition-colors font-medium text-left py-2"
           >
             Film
           </button>
           <button
             onClick={() => handleFilterClick("series")}
-            className="hover:text-red-400 transition-colors font-medium"
+            className="hover:text-red-400 transition-colors font-medium text-left py-2"
           >
-          Série
+            Série
           </button>
           <button
             onClick={() => handleFilterClick("nouveaute")}
-            className="hover:text-red-400 transition-colors font-medium"
+            className="hover:text-red-400 transition-colors font-medium text-left py-2"
           >
             Nouveauté
           </button>
           <button
             onClick={() => handleFilterClick("documentaire")}
-            className="hover:text-red-400 transition-colors font-medium"
+            className="hover:text-red-400 transition-colors font-medium text-left py-2"
           >
             Documentaire
           </button>
           <button
             onClick={() => handleFilterClick("maliste")}
-            className="hover:text-red-400 transition-colors font-medium"
+            className="hover:text-red-400 transition-colors font-medium text-left py-2"
           >
             Ma liste
           </button>
-        </nav>
 
-        {/* Search Bar and Profile */}
-        <div className="flex items-center gap-6 mt-4 sm:mt-0 w-full sm:w-auto justify-center">
-          {/* Search Input with integrated icon and suggestions */}
-          <form onSubmit={handleSearchSubmit} className="relative"> {/* Removed ref={searchInputRef} from form */}
+          {/* Mobile Search */}
+          <form onSubmit={handleSearchSubmit} className="relative mt-4 sm:hidden">
             <input
-              id="search-input"
+              id="search-input-mobile"
               type="text"
               value={searchQuery}
               onChange={handleInputChange}
               placeholder="Rechercher un film..."
-              className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-full sm:w-64 md:w-80"
-              ref={searchInputRef} // Added ref to the input element
-              onFocus={() => searchQuery.trim().length > 2 && suggestions.length > 0 && setShowSuggestions(true)} // Show suggestions on focus if query exists
+              className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-full"
+              onFocus={() => searchQuery.trim().length > 2 && suggestions.length > 0 && setShowSuggestions(true)}
             />
             <button
               type="submit"
@@ -189,27 +295,22 @@ const Header: React.FC = () => {
               </svg>
             </button>
 
-            {/* Suggestions Dropdown */}
+            {/* Mobile Suggestions */}
             {showSuggestions && suggestions.length > 0 && (
-              <div id="suggestions-dropdown" className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
+              <div id="suggestions-dropdown-mobile" className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
                 {suggestions.map((suggestion) => (
                   <div
                     key={suggestion.id}
-                    className="p-2 cursor-pointer hover:bg-gray-700 text-white truncate"
+                    className="p-2 cursor-pointer hover:bg-gray-700 text-white truncate text-sm"
                     onClick={() => handleSuggestionClick(suggestion.title || suggestion.name)}
                   >
-                    {suggestion.title || suggestion.name} ({suggestion.release_date?.substring(0, 4) || suggestion.first_air_date?.substring(0, 4)})
+                    {suggestion.title || suggestion.name}
                   </div>
                 ))}
               </div>
             )}
           </form>
-
-          {/* Profile Circle */}
-          <div className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors cursor-pointer flex items-center justify-center">
-            <span className="text-white font-bold">👤</span>
-          </div>
-        </div>
+        </nav>
       </div>
     </header>
   );
