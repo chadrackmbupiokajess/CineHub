@@ -26,13 +26,13 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
   if (!movie) {
     return (
-      <div className="container mx-auto p-4 text-center pt-20 md:pt-8"> {/* Keep container for error page */}
+      <div className="container mx-auto p-4 text-center pt-20 md:pt-8">
         <h1 className="text-3xl font-bold text-red-500">Film non trouvé</h1>
         <p className="text-lg text-gray-600 dark:text-gray-400 mt-4">
           Désolé, nous n'avons pas pu trouver les détails de ce film.
         </p>
-        <Link href="/" className="text-blue-500 hover:underline mt-4 block">
-          Retour à l'accueil
+        <Link href="/" className="text-blue-500 hover:underline inline-block">
+          &larr; Retour à l'accueil
         </Link>
       </div>
     );
@@ -47,10 +47,11 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
   const otherTrailers = backgroundTrailer ? [] : allTrailers.slice(0, 1);
 
-  const similarMovies = similarMoviesData.results.slice(0, 4);
+  // Safely access similarMoviesData.results
+  const similarMovies = similarMoviesData?.results?.slice(0, 4) || [];
 
   return (
-    <div className="pt-20 md:pt-8"> {/* Top padding for fixed header */}
+    <div className="pt-20 md:pt-8">
       {/* Back link - keep it within a container for readability */}
       <div className="container mx-auto px-4 md:px-8 mb-6">
         <Link href="/" className="text-blue-500 hover:underline inline-block">
@@ -59,13 +60,13 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
       </div>
 
       {/* Main Movie Details Section - This will be full width */}
-      <div className="relative mb-8 overflow-hidden bg-white dark:bg-gray-800"> {/* No container, full width, added background */}
+      <div className="relative mb-8 overflow-hidden bg-white dark:bg-gray-800">
         {/* MovieTrailerSection handles background trailer for desktop and regular trailer for mobile */}
         <MovieTrailerSection allTrailers={allTrailers} />
 
         {/* Content Overlay - to ensure text is readable over background trailer */}
         {/* This div will contain the poster and text details */}
-        <div className="relative z-20 flex flex-col md:flex-row gap-8 p-4 md:p-8"> {/* Added padding here */}
+        <div className="relative z-20 flex flex-col md:flex-row gap-8 p-4 md:p-8">
           {/* Poster Image */}
           <div className="w-full md:w-1/3 flex-shrink-0">
             <Image
@@ -78,9 +79,9 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
             />
           </div>
           {/* Text Details */}
-          <div className="w-full md:w-2/3 text-gray-900 dark:text-white">
+          <div className="w-full md:w-2/3 text-white">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">{movie.title}</h1>
-            <p className="text-gray-700 dark:text-gray-300 text-base md:text-lg mb-4">{movie.overview}</p>
+            <p className="text-white text-base md:text-lg mb-4">{movie.overview}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <p><strong>Note:</strong> {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"} / 10 ({movie.vote_count} votes)</p>
               <p><strong>Date de sortie:</strong> {movie.release_date}</p>
@@ -115,7 +116,7 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
       {/* Other Trailers (if any) */}
       {otherTrailers.length > 0 && (
-        <div className="container mx-auto px-4 md:px-8 mt-8"> {/* Keep container for horizontal padding */}
+        <div className="container mx-auto px-4 md:px-8 mt-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Autres Bandes-annonces</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherTrailers.map((trailer: any) => (
@@ -132,7 +133,7 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
       {/* Similar Movies */}
       {similarMovies.length > 0 && (
-        <div className="container mx-auto px-4 md:px-8 mt-8"> {/* Keep container for horizontal padding */}
+        <div className="container mx-auto px-4 md:px-8 mt-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Films similaires</h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {similarMovies.map((similarMovie: any) => (
