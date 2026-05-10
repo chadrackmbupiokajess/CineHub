@@ -43,7 +43,10 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
   const allTrailers = videos.results.filter((video: any) => video.type === "Trailer" && video.site === "YouTube");
   const backgroundTrailer = allTrailers.length > 0 ? allTrailers[0] : null;
-  const otherTrailers = allTrailers.slice(1);
+
+  // If there's a background trailer, otherTrailers should be empty.
+  // Otherwise, take the first available trailer for the "Autres Bandes-annonces" section.
+  const otherTrailers = backgroundTrailer ? [] : allTrailers.slice(0, 1);
 
   const similarMovies = similarMoviesData.results.slice(0, 4);
 
@@ -134,7 +137,7 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
       {similarMovies.length > 0 && (
         <div className="mt-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Films similaires</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"> {/* Changed grid-cols-1 to grid-cols-2 */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {similarMovies.map((similarMovie: any) => (
               <MovieCard key={similarMovie.id} item={similarMovie} />
             ))}
