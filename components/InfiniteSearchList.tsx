@@ -44,7 +44,7 @@ const InfiniteSearchList: React.FC<InfiniteSearchListProps> = ({
       if (entries[0].isIntersecting && hasMore && !isLoading) {
         loadMore();
       }
-    }, { threshold: 0.1 });
+    }, { threshold: 0.5 }); // Charge à 50% de la page
 
     if (observerTarget.current) {
       observer.observe(observerTarget.current);

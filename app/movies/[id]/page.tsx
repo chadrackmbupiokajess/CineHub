@@ -80,7 +80,7 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
           {/* Movie Details Content */}
           <div className="relative z-20 p-4 text-white">
             <h1 className="text-4xl font-bold mb-4">{movie.title}</h1>
-            <p className="text-gray-300 text-lg mb-4">{movie.overview}</p> {/* Changed text color for readability */}
+            <p className="text-gray-300 text-lg mb-4">{movie.overview}</p>
             <div className="grid grid-cols-2 gap-4 mb-6">
               <p><strong>Note:</strong> {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"} / 10 ({movie.vote_count} votes)</p>
               <p><strong>Date de sortie:</strong> {movie.release_date}</p>
@@ -98,7 +98,7 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
             {/* Casting */}
             {credits.cast && credits.cast.length > 0 && (
-              <div className="mt-6"> {/* Added mt-6 for spacing */}
+              <div className="mt-6">
                 <h2 className="text-2xl font-bold mb-3">Casting</h2>
                 <div className="flex flex-wrap gap-2">
                   {credits.cast.slice(0, 5).map((person: any) => (
@@ -134,9 +134,9 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
       {similarMovies.length > 0 && (
         <div className="mt-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Films similaires</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {similarMovies.map((similarMovie: any) => (
-              <MovieCard key={similarMovie.id} movie={similarMovie} />
+              <MovieCard key={similarMovie.id} item={similarMovie} />
             ))}
           </div>
         </div>

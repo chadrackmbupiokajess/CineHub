@@ -35,7 +35,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-gray-100 text-gray-900">
         {!isWatchPage && <Header />}
-        <main className="flex-1">
+        <main className="flex-1 pt-20">
           {children}
         </main>
         {!isWatchPage && <Footer />}

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-// import ThemeToggle from "./ThemeToggle"; // Removed ThemeToggle import
+import Image from "next/image"; // Import Image component
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,17 +50,17 @@ const Header: React.FC = () => {
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors mr-8">
-          CineHub
+          <Image
+            src="/logo.png" // Updated to logo.png
+            alt="CineHub Logo"
+            width={120} // Adjust width as needed
+            height={40} // Adjust height as needed
+            priority // Prioritize loading for LCP
+          />
         </Link>
 
         {/* Left Filters */}
         <nav className="flex items-center space-x-6 flex-1">
-          <button
-            onClick={() => router.push("/")}
-            className="hover:text-red-400 transition-colors font-medium"
-          >
-            Tous
-          </button>
           <button
             onClick={() => handleFilterClick("films")}
             className="hover:text-red-400 transition-colors font-medium"
