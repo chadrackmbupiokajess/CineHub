@@ -32,7 +32,7 @@ export async function fetchMovies(endpoint: string, params?: Record<string, stri
   } catch (error: any) {
     clearTimeout(timeoutId); // Ensure timeout is cleared even on error
     if (error.name === 'AbortError') {
-      throw new Error(`Request to TMDb timed out after 5 seconds for endpoint: ${endpoint}`);
+      throw new Error(`Request to TMDb timed out after 10 seconds for endpoint: ${endpoint}`);
     }
     throw new Error(`Failed to fetch from TMDb for endpoint ${endpoint}: ${error.message}`);
   }
@@ -64,4 +64,25 @@ export async function searchMovies(query: string) {
 
 export async function getTrending(mediaType: "all" | "movie" | "tv" = "all", timeWindow: "day" | "week" = "week") {
   return fetchMovies(`/trending/${mediaType}/${timeWindow}`);
+}
+
+// New functions for filtering
+export async function getPopularTvShows() {
+  return fetchMovies("/tv/popular");
+}
+
+export async function getUpcomingMovies() {
+  return fetchMovies("/movie/upcoming");
+}
+
+export async function getGenres(mediaType: "movie" | "tv" = "movie") {
+  return fetchMovies(`/genre/${mediaType}/list`);
+}
+
+export async function getMoviesByGenre(genreId: number, page: number = 1) {
+  return fetchMovies("/discover/movie", { with_genres: genreId.toString(), page: page.toString() });
+}
+
+export async function getTvShowsByGenre(genreId: number, page: number = 1) {
+  return fetchMovies("/discover/tv", { with_genres: genreId.toString(), page: page.toString() });
 }

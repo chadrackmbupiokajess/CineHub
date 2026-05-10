@@ -1,24 +1,68 @@
-import { getPopularMovies, getTrending } from "../lib/tmdb";
+import { getPopularMovies, getTrending, getPopularTvShows, getUpcomingMovies, getMoviesByGenre } from "../lib/tmdb";
 import MovieCard from "../components/MovieCard";
-import HeroCarousel from "../components/HeroCarousel"; // Import HeroCarousel
+import HeroCarousel from "../components/HeroCarousel";
 
-export default async function Home() {
-  const popularMovies = await getPopularMovies();
-  const trendingItems = await getTrending("all", "week"); // Get trending movies and TV shows for the week
+interface HomePageProps {
+  searchParams: Promise<{
+    type?: string;
+  }>;
+}
+
+export default async function Home({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+  const filterType = params.type;
+  let displayItems: any[] = [];
+  let sectionTitle = "Films Populaires";
+  let showHero = true; // By default, show the hero carousel
+
+  if (filterType) {
+    showHero = false; // Hide hero if a filter is active
+    switch (filterType) {
+      case "movie":
+        displayItems = (await getPopularMovies()).results;
+        sectionTitle = "Films Populaires";
+        break;
+      case "tv":
+        displayItems = (await getPopularTvShows()).results;
+        sectionTitle = "Séries Populaires";
+        break;
+      case "new":
+        displayItems = (await getUpcomingMovies()).results;
+        sectionTitle = "Nouveautés (Films à venir)";
+        break;
+      case "documentary":
+        // TMDb genre ID for Documentary is typically 99 for movies
+        displayItems = (await getMoviesByGenre(99)).results;
+        sectionTitle = "Documentaires";
+        break;
+      default:
+        // Fallback to popular movies if an unknown filter is provided
+        displayItems = (await getPopularMovies()).results;
+        sectionTitle = "Films Populaires";
+        showHero = true; // If filter is invalid, show hero
+        break;
+    }
+  } else {
+    // No filter, show popular movies and hero
+    displayItems = (await getPopularMovies()).results;
+  }
+
+  const trendingItems = await getTrending("all", "week"); // Always fetch trending for hero, but only display if showHero is true
 
   return (
     <div>
-      {/* Hero Carousel Section */}
-      {trendingItems.results && trendingItems.results.length > 0 && (
+      {/* Hero Carousel Section - Conditionally rendered */}
+      {showHero && trendingItems.results && trendingItems.results.length > 0 && (
         <HeroCarousel items={trendingItems.results} />
       )}
 
-      {/* Popular Movies Section */}
-      <div className="container mx-auto p-4 mt-8"> {/* Added mt-8 for spacing */}
-        <h1 className="text-3xl font-bold mb-6 text-center">Films Populaires</h1>
+      {/* Display Section */}
+      <div className="container mx-auto p-4 mt-8">
+        <h1 className="text-3xl font-bold mb-6 text-center">{sectionTitle}</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {popularMovies.results.map((movie: any) => (
-            <MovieCard key={movie.id} movie={movie} />
+          {displayItems.map((item: any) => (
+            // Corrected: pass 'item' prop instead of 'movie'
+            <MovieCard key={item.id} item={item} />
           ))}
         </div>
       </div>
