@@ -8,41 +8,12 @@ export default function WatchMoviePage() {
   const movieId = params.id as string;
   const router = useRouter(); // Initialize useRouter
 
-  const [isFullScreen, setIsFullScreen] = useState(false);
+  // Removed isFullScreen state
   const [showBackButton, setShowBackButton] = useState(false); // State to control back button visibility
 
   const vidsrcUrl = `https://vidsrc.me/embed/movie?tmdb=${movieId}`;
 
-  useEffect(() => {
-    // Attempt to go full screen when the component mounts
-    const elem = document.documentElement; // Target the whole document
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen().then(() => setIsFullScreen(true)).catch(() => setIsFullScreen(false));
-    } else if ((elem as any).mozRequestFullScreen) { /* Firefox */
-      (elem as any).mozRequestFullScreen().then(() => setIsFullScreen(true)).catch(() => setIsFullScreen(false));
-    } else if ((elem as any).webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-      (elem as any).webkitRequestFullscreen().then(() => setIsFullScreen(true)).catch(() => setIsFullScreen(false));
-    } else if ((elem as any).msRequestFullscreen) { /* IE/Edge */
-      (elem as any).msRequestFullscreen().then(() => setIsFullScreen(true)).catch(() => setIsFullScreen(false));
-    }
-
-    // Listen for fullscreen change events
-    const handleFullscreenChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('msfullscreenchange', handleFullscreenChange);
-
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('msfullscreenchange', handleFullscreenChange);
-    };
-  }, []);
+  // Removed useEffect for automatic fullscreen attempt
 
   return (
     <div
@@ -52,7 +23,7 @@ export default function WatchMoviePage() {
     >
       <iframe
         src={vidsrcUrl}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" // Expanded allow permissions
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" // Keep fullscreen permission for manual activation
         frameBorder="0"
         className="w-full h-full"
         title={`Watch movie ${movieId}`}
