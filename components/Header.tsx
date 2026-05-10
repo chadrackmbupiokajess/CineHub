@@ -1,39 +1,34 @@
 "use client"; // This component needs client-side interactivity
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
-import Image from "next/image"; // Import Image component
+import Image from "next/image";
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    if (query.trim()) {
-      router.push(`/search?query=${encodeURIComponent(query.trim())}`);
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
-  const handleSearchIconClick = () => {
-    setSearchOpen(!searchOpen);
-    if (!searchOpen) {
-      // Focus input when opening
-      setTimeout(() => {
-        const input = document.getElementById("search-input") as HTMLInputElement;
-        if (input) input.focus();
-      }, 0);
-    } else {
-      setSearchQuery("");
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedQuery = searchQuery.trim();
+    if (trimmedQuery) {
+      router.push(`/search?query=${encodeURIComponent(trimmedQuery)}`);
+      // router.refresh(); // Removed router.refresh()
+    } else if (pathname === '/search') {
+      router.push('/');
+      // router.refresh(); // Removed router.refresh()
     }
   };
 
   const handleFilterClick = (filter: string) => {
-    if (filter === "all") { // New filter for "Tous"
-      router.push("/"); // Navigate to home without any type parameter
+    if (filter === "all") {
+      router.push("/");
     } else if (filter === "films") {
       router.push("/?type=movie");
     } else if (filter === "series") {
@@ -64,7 +59,7 @@ const Header: React.FC = () => {
         {/* Left Filters */}
         <nav className="flex items-center space-x-6 flex-1">
           <button
-            onClick={() => handleFilterClick("all")} // New "Tous" button
+            onClick={() => handleFilterClick("all")}
             className="hover:text-red-400 transition-colors font-medium"
           >
             Tous
@@ -79,7 +74,7 @@ const Header: React.FC = () => {
             onClick={() => handleFilterClick("series")}
             className="hover:text-red-400 transition-colors font-medium"
           >
-            Série
+          Série
           </button>
           <button
             onClick={() => handleFilterClick("nouveaute")}
@@ -103,31 +98,24 @@ const Header: React.FC = () => {
 
         {/* Search Bar and Profile */}
         <div className="flex items-center gap-6">
-          {/* Search Bar */}
-          <div className="flex items-center gap-2">
-            {searchOpen && (
-              <input
-                id="search-input"
-                type="text"
-                value={searchQuery}
-                onChange={handleSearch}
-                placeholder="Rechercher un film..."
-                className="p-2 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-64"
-                onBlur={() => {
-                  if (!searchQuery) {
-                    setSearchOpen(false);
-                  }
-                }}
-              />
-            )}
+          {/* Search Input with integrated icon */}
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <input
+              id="search-input"
+              type="text"
+              value={searchQuery}
+              onChange={handleInputChange}
+              placeholder="Rechercher un film..."
+              className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-64"
+            />
             <button
-              onClick={handleSearchIconClick}
-              className="text-white hover:text-red-400 transition-colors"
-              title="Rechercher"
+              type="submit"
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-white hover:text-red-400 transition-colors"
+              aria-label="Rechercher"
             >
               <svg
-                width="24"
-                height="24"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -139,7 +127,7 @@ const Header: React.FC = () => {
                 <path d="m21 21-4.35-4.35"></path>
               </svg>
             </button>
-          </div>
+          </form>
 
           {/* Profile Circle */}
           <div className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors cursor-pointer flex items-center justify-center">

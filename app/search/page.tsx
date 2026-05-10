@@ -1,35 +1,25 @@
-import { searchMovies } from "../../lib/tmdb";
-import InfiniteSearchList from "../../components/InfiniteSearchList";
+import SearchResultsClient from "../../components/SearchResultsClient"; // Import the client component
 
 interface SearchPageProps {
   searchParams: Promise<{
     query?: string;
-  }>;
+  }> | {
+    query?: string;
+  };
 }
 
-export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const params = await searchParams;
-  const query = params.query;
-  let movies = [];
-
-  if (query) {
-    const data = await searchMovies(query);
-    movies = data.results;
-  }
+export default async function SearchPage({ searchParams: rawSearchParams }: SearchPageProps) {
+  // Await searchParams if it's a Promise, otherwise use it directly
+  const searchParams = await Promise.resolve(rawSearchParams);
+  const query = searchParams.query || ''; // Ensure query is always a string
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 pt-16"> {/* Added pt-16 for fixed header */}
       <h1 className="text-3xl font-bold mb-6 text-center">
-        {query ? `Résultats de recherche pour "${query}"` : "Rechercher des films"}
+        {query.trim() !== '' ? `Résultats de recherche pour "${query}"` : "Veuillez saisir un terme de recherche."}
       </h1>
-      {query && (
-        <InfiniteSearchList initialItems={movies} query={query} />
-      )}
-      {!query && (
-        <p className="text-center text-lg text-gray-600 dark:text-gray-400">
-          Veuillez entrer une recherche.
-        </p>
-      )}
+
+      <SearchResultsClient initialQuery={query} />
     </div>
   );
 }
