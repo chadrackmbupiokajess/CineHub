@@ -18,19 +18,32 @@ const InfiniteMovieList: React.FC<InfiniteMovieListProps> = ({
   const [hasMore, setHasMore] = useState(true);
   const observerTarget = useRef(null);
 
+  // Reset items and page when filterType or initialItems change
+  useEffect(() => {
+    setItems(initialItems);
+    setPage(1);
+    setHasMore(true); // Assume there's more to load when filter changes
+  }, [initialItems, filterType]);
+
   const loadMore = useCallback(async () => {
     if (isLoading || !hasMore) return;
 
     setIsLoading(true);
     try {
       const type = filterType || "movie";
+      // Note: You need to implement the /api/movies endpoint to handle pagination and filtering
+      // For now, this assumes it returns a JSON array of items
       const response = await fetch(`/api/movies?type=${type}&page=${page + 1}`);
       const newItems = await response.json();
       
       if (newItems.length === 0) {
         setHasMore(false);
       } else {
-        setItems((prevItems) => [...prevItems, ...newItems]);
+        setItems((prevItems) => {
+          const existingIds = new Set(prevItems.map(item => item.id));
+          const uniqueNewItems = newItems.filter((item: any) => !existingIds.has(item.id));
+          return [...prevItems, ...uniqueNewItems];
+        });
         setPage((prevPage) => prevPage + 1);
       }
     } catch (error) {
