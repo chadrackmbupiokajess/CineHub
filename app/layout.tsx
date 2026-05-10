@@ -8,7 +8,10 @@ export const metadata: Metadata = {
   title: "CineHub - Votre destination film",
   description: "Découvrez et explorez des films avec CineHub, propulsé par TMDb.",
   icons: {
-    icon: "/logo.png", // Favicon
+    icon: [
+      { url: "/logo.png", type: "image/png" },
+    ],
+    apple: "/logo.png",
   },
 };
 

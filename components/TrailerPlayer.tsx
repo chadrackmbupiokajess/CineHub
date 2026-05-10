@@ -5,32 +5,39 @@ import React, { useEffect, useState } from "react";
 interface TrailerPlayerProps {
   videoKey: string;
   title: string;
-  delay?: number; // Delay in milliseconds before autoplay for non-background videos
+  delay?: number; // Delay in milliseconds before autoplay/visibility
   isBackground?: boolean; // New prop to indicate if it's a background video
 }
 
 const TrailerPlayer: React.FC<TrailerPlayerProps> = ({ videoKey, title, delay = 3000, isBackground = false }) => {
-  const [src, setSrc] = useState("");
+  const initialEmbedUrl = `https://www.youtube.com/embed/${videoKey}?controls=0&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1`;
+
+  // Initialize src directly if it's a background video, otherwise start empty
+  const [src, setSrc] = useState(isBackground ? `${initialEmbedUrl}&autoplay=1&loop=1&playlist=${videoKey}` : "");
+  const [iframeOpacity, setIframeOpacity] = useState(isBackground ? 0 : 1);
 
   useEffect(() => {
-    let embedUrl = `https://www.youtube.com/embed/${videoKey}?controls=0&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3`;
-
+    // Only run logic for non-background videos or for background video opacity transition
     if (isBackground) {
-      // For background videos: autoplay immediately, loop, and add playlist for looping
-      // Removed mute=1 from here
-      embedUrl += `&autoplay=1&loop=1&playlist=${videoKey}`;
-      setSrc(embedUrl);
-    } else {
-      // For regular trailers: apply delay before autoplay
-      const timer = setTimeout(() => {
-        setSrc(`${embedUrl}&autoplay=1`);
+      // For background videos, src is already set. Just handle opacity transition.
+      const opacityTimer = setTimeout(() => {
+        setIframeOpacity(1);
       }, delay);
-      setSrc(embedUrl); // Set initial src without autoplay
-      return () => clearTimeout(timer); // Cleanup the timer
+      return () => clearTimeout(opacityTimer);
+    } else {
+      // For regular trailers: iframe is empty initially, then loads with autoplay after delay
+      const autoplayTimer = setTimeout(() => {
+        setSrc(`${initialEmbedUrl}&autoplay=1`);
+      }, delay);
+      return () => clearTimeout(autoplayTimer);
     }
-  }, [videoKey, delay, isBackground]);
+  }, [videoKey, delay, isBackground, initialEmbedUrl]); // Add initialEmbedUrl to dependencies
 
-  if (!src) return null; // Don't render iframe until src is determined
+  // Only render iframe if src is set (or if it's a background video that's waiting for opacity)
+  if (!src && !isBackground) {
+    // For non-background videos, show a placeholder during the delay
+    return <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center text-gray-500">Chargement de la bande-annonce...</div>;
+  }
 
   return (
     <div className={`aspect-video ${isBackground ? 'absolute inset-0 w-full h-full' : ''}`}>
@@ -40,9 +47,9 @@ const TrailerPlayer: React.FC<TrailerPlayerProps> = ({ videoKey, title, delay = 
         src={src}
         title={title}
         frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
         className={`rounded-lg ${isBackground ? 'object-cover' : ''}`}
+        style={{ opacity: iframeOpacity, transition: 'opacity 0.5s ease-in-out' }}
       ></iframe>
     </div>
   );
