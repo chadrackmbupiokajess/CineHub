@@ -1,12 +1,15 @@
 "use client"; // This page will contain client-side interactivity (iframe)
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation"; // Import useRouter
 import { useEffect, useState } from "react";
 
 export default function WatchMoviePage() {
   const params = useParams();
   const movieId = params.id as string;
+  const router = useRouter(); // Initialize useRouter
+
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showBackButton, setShowBackButton] = useState(false); // State to control back button visibility
 
   const vidsrcUrl = `https://vidsrc.me/embed/movie?tmdb=${movieId}`;
 
@@ -42,7 +45,11 @@ export default function WatchMoviePage() {
   }, []);
 
   return (
-    <div className="w-screen h-screen bg-black flex items-center justify-center">
+    <div
+      className="w-screen h-screen bg-black relative" // Added relative for absolute positioning of button
+      onMouseEnter={() => setShowBackButton(true)}
+      onMouseLeave={() => setShowBackButton(false)}
+    >
       <iframe
         src={vidsrcUrl}
         allowFullScreen
@@ -50,11 +57,25 @@ export default function WatchMoviePage() {
         className="w-full h-full"
         title={`Watch movie ${movieId}`}
       ></iframe>
-      {!isFullScreen && (
-        <div className="absolute top-0 left-0 right-0 p-4 bg-red-600 text-white text-center">
-          Cliquez sur le bouton plein écran du lecteur si le mode plein écran automatique ne fonctionne pas.
-        </div>
-      )}
+
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()} // Use router.back() for navigation
+        className={`absolute top-4 left-4 p-3 bg-gray-800 bg-opacity-75 rounded-full text-white transition-opacity duration-300 z-50
+          ${showBackButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} // Hide by default, show on hover
+        aria-label="Retour"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </button>
     </div>
   );
 }
