@@ -16,8 +16,9 @@ const TrailerPlayer: React.FC<TrailerPlayerProps> = ({ videoKey, title, delay = 
     let embedUrl = `https://www.youtube.com/embed/${videoKey}?controls=0&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3`;
 
     if (isBackground) {
-      // For background videos: autoplay immediately, mute, loop, and add playlist for looping
-      embedUrl += `&autoplay=1&mute=1&loop=1&playlist=${videoKey}`;
+      // For background videos: autoplay immediately, loop, and add playlist for looping
+      // Removed mute=1 from here
+      embedUrl += `&autoplay=1&loop=1&playlist=${videoKey}`;
       setSrc(embedUrl);
     } else {
       // For regular trailers: apply delay before autoplay

@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import MovieCard from "../../../components/MovieCard";
 import TrailerPlayer from "../../../components/TrailerPlayer";
-import WatchFullMovieButton from "../../../components/WatchFullMovieButton";
 
 interface MovieDetailsPageProps {
   params: Promise<{
@@ -44,7 +43,7 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
   const allTrailers = videos.results.filter((video: any) => video.type === "Trailer" && video.site === "YouTube");
   const backgroundTrailer = allTrailers.length > 0 ? allTrailers[0] : null;
-  const otherTrailers = allTrailers.slice(1); // Other trailers for a separate section
+  const otherTrailers = allTrailers.slice(1);
 
   const similarMovies = similarMoviesData.results.slice(0, 4);
 
@@ -53,8 +52,8 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
       <Link href="/" className="text-blue-500 hover:underline mb-6 inline-block">
         &larr; Retour à l'accueil
       </Link>
-      <div className="flex flex-col md:flex-row gap-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 mb-8 relative"> {/* Added relative */}
-        <div className="md:w-1/3 flex-shrink-0 z-10"> {/* Added z-10 to image */}
+      <div className="flex flex-col md:flex-row gap-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 mb-8 relative">
+        <div className="md:w-1/3 flex-shrink-0 z-10">
           <Image
             src={imageUrl}
             alt={movie.title}
@@ -64,7 +63,7 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
             priority
           />
         </div>
-        <div className="md:w-2/3 relative z-10"> {/* Added relative and z-10 */}
+        <div className="md:w-2/3 relative z-10">
           {/* Background Trailer */}
           {backgroundTrailer && (
             <div className="absolute inset-0 overflow-hidden rounded-lg">
@@ -79,9 +78,9 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
           )}
 
           {/* Movie Details Content */}
-          <div className="relative z-20 p-4 text-white"> {/* Added relative z-20 and text-white for readability */}
+          <div className="relative z-20 p-4 text-white">
             <h1 className="text-4xl font-bold mb-4">{movie.title}</h1>
-            <p className="text-lg mb-4">{movie.overview}</p>
+            <p className="text-gray-300 text-lg mb-4">{movie.overview}</p> {/* Changed text color for readability */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <p><strong>Note:</strong> {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"} / 10 ({movie.vote_count} votes)</p>
               <p><strong>Date de sortie:</strong> {movie.release_date}</p>
@@ -90,11 +89,16 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
             </div>
 
             {/* Watch Full Movie Button */}
-            <WatchFullMovieButton movieTitle={movie.title} />
+            <Link href={`/watch/${movieId}`} className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition-colors duration-200 shadow-lg mt-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+              </svg>
+              Voir le film complet
+            </Link>
 
             {/* Casting */}
             {credits.cast && credits.cast.length > 0 && (
-              <div className="mb-6">
+              <div className="mt-6"> {/* Added mt-6 for spacing */}
                 <h2 className="text-2xl font-bold mb-3">Casting</h2>
                 <div className="flex flex-wrap gap-2">
                   {credits.cast.slice(0, 5).map((person: any) => (
@@ -119,7 +123,7 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
                 key={trailer.key}
                 videoKey={trailer.key}
                 title={trailer.name}
-                delay={0} // No delay for other trailers
+                delay={0}
               />
             ))}
           </div>
