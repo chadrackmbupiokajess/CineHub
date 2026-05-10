@@ -97,9 +97,9 @@ const Header: React.FC = () => {
 
   return (
     <header className="fixed top-0 w-full bg-gray-900 text-white p-4 shadow-md z-50">
-      <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="container mx-auto flex flex-wrap justify-center sm:flex-row sm:justify-between items-center gap-4"> {/* Adjusted for responsiveness */}
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors mr-8">
+        <Link href="/" className="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors sm:mr-8"> {/* Removed mr-8 on small screens */}
           <Image
             src="/logo.png"
             alt="CineHub Logo"
@@ -110,7 +110,7 @@ const Header: React.FC = () => {
         </Link>
 
         {/* Left Filters */}
-        <nav className="flex items-center space-x-6 flex-1">
+        <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2 sm:flex-nowrap sm:space-x-6 sm:flex-1"> {/* Adjusted for responsiveness */}
           <button
             onClick={() => handleFilterClick("all")}
             className="hover:text-red-400 transition-colors font-medium"
@@ -150,16 +150,16 @@ const Header: React.FC = () => {
         </nav>
 
         {/* Search Bar and Profile */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 mt-4 sm:mt-0 w-full sm:w-auto justify-center"> {/* Adjusted for responsiveness */}
           {/* Search Input with integrated icon and suggestions */}
-          <form onSubmit={handleSearchSubmit} className="relative" ref={searchInputRef}>
+          <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-auto" ref={searchInputRef}> {/* Adjusted for responsiveness */}
             <input
               id="search-input"
               type="text"
               value={searchQuery}
               onChange={handleInputChange}
               placeholder="Rechercher un film..."
-              className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-80" // Changed w-64 to w-80
+              className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-full sm:w-64 md:w-80" // Adjusted for responsiveness
             />
             <button
               type="submit"

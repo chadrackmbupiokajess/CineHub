@@ -134,7 +134,7 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
       {similarMovies.length > 0 && (
         <div className="mt-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Films similaires</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"> {/* Changed grid-cols-1 to grid-cols-2 */}
             {similarMovies.map((similarMovie: any) => (
               <MovieCard key={similarMovie.id} item={similarMovie} />
             ))}
