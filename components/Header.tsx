@@ -2,29 +2,81 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react"; // Import useRef
 import Image from "next/image";
+import { searchMovies } from "../lib/tmdb"; // Import searchMovies for suggestions
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const searchInputRef = useRef<HTMLInputElement>(null); // Ref for the search input
 
+  // Debounce logic for fetching suggestions
+  useEffect(() => {
+    const handler = setTimeout(async () => {
+      const trimmedQuery = searchQuery.trim();
+      if (trimmedQuery.length > 2) { // Only fetch suggestions if query is at least 3 characters
+        try {
+          const data = await searchMovies(trimmedQuery);
+          setSuggestions(data.results.slice(0, 5)); // Limit to top 5 suggestions
+          setShowSuggestions(true);
+        } catch (error) {
+          console.error("Error fetching suggestions:", error);
+          setSuggestions([]);
+          setShowSuggestions(false);
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300); // 300ms debounce delay for suggestions
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
+  // Handle form submission (Enter key or click on search icon)
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedQuery = searchQuery.trim();
     if (trimmedQuery) {
       router.push(`/search?query=${encodeURIComponent(trimmedQuery)}`);
-      // router.refresh(); // Removed router.refresh()
+      setShowSuggestions(false); // Hide suggestions after full search
     } else if (pathname === '/search') {
       router.push('/');
-      // router.refresh(); // Removed router.refresh()
+      setShowSuggestions(false); // Hide suggestions
     }
   };
+
+  // Handle click on a suggestion
+  const handleSuggestionClick = (suggestionTitle: string) => {
+    setSearchQuery(suggestionTitle);
+    router.push(`/search?query=${encodeURIComponent(suggestionTitle)}`);
+    setShowSuggestions(false); // Hide suggestions
+  };
+
+  // Hide suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchInputRef.current && !searchInputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
 
   const handleFilterClick = (filter: string) => {
     if (filter === "all") {
@@ -40,6 +92,7 @@ const Header: React.FC = () => {
     } else if (filter === "maliste") {
       router.push("/watchlist");
     }
+    setShowSuggestions(false); // Hide suggestions when clicking a filter
   };
 
   return (
@@ -98,8 +151,8 @@ const Header: React.FC = () => {
 
         {/* Search Bar and Profile */}
         <div className="flex items-center gap-6">
-          {/* Search Input with integrated icon */}
-          <form onSubmit={handleSearchSubmit} className="relative">
+          {/* Search Input with integrated icon and suggestions */}
+          <form onSubmit={handleSearchSubmit} className="relative" ref={searchInputRef}> {/* Added ref */}
             <input
               id="search-input"
               type="text"
@@ -127,6 +180,21 @@ const Header: React.FC = () => {
                 <path d="m21 21-4.35-4.35"></path>
               </svg>
             </button>
+
+            {/* Suggestions Dropdown */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
+                {suggestions.map((suggestion) => (
+                  <div
+                    key={suggestion.id}
+                    className="p-2 cursor-pointer hover:bg-gray-700 text-white truncate"
+                    onClick={() => handleSuggestionClick(suggestion.title || suggestion.name)}
+                  >
+                    {suggestion.title || suggestion.name} ({suggestion.release_date?.substring(0, 4) || suggestion.first_air_date?.substring(0, 4)})
+                  </div>
+                ))}
+              </div>
+            )}
           </form>
 
           {/* Profile Circle */}
