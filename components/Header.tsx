@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useState, useEffect, useRef } from "react"; // Import useRef
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { searchMovies } from "../lib/tmdb"; // Import searchMovies for suggestions
 
@@ -152,14 +152,14 @@ const Header: React.FC = () => {
         {/* Search Bar and Profile */}
         <div className="flex items-center gap-6">
           {/* Search Input with integrated icon and suggestions */}
-          <form onSubmit={handleSearchSubmit} className="relative" ref={searchInputRef}> {/* Added ref */}
+          <form onSubmit={handleSearchSubmit} className="relative" ref={searchInputRef}>
             <input
               id="search-input"
               type="text"
               value={searchQuery}
               onChange={handleInputChange}
               placeholder="Rechercher un film..."
-              className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-64"
+              className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-80" // Changed w-64 to w-80
             />
             <button
               type="submit"
