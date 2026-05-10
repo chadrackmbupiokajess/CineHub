@@ -64,10 +64,16 @@ const Header: React.FC = () => {
     setShowSuggestions(false); // Hide suggestions
   };
 
-  // Hide suggestions when clicking outside
+  // Hide suggestions when clicking outside the input and suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Check if the click is outside the input and the suggestions dropdown
       if (searchInputRef.current && !searchInputRef.current.contains(event.target as Node)) {
+        // Also check if the click is outside the suggestions dropdown itself
+        const suggestionsDropdown = document.getElementById('suggestions-dropdown');
+        if (suggestionsDropdown && suggestionsDropdown.contains(event.target as Node)) {
+          return; // Don't hide if clicking on a suggestion
+        }
         setShowSuggestions(false);
       }
     };
@@ -97,9 +103,9 @@ const Header: React.FC = () => {
 
   return (
     <header className="fixed top-0 w-full bg-gray-900 text-white p-4 shadow-md z-50">
-      <div className="container mx-auto flex flex-wrap justify-center sm:flex-row sm:justify-between items-center gap-4"> {/* Adjusted for responsiveness */}
+      <div className="container mx-auto flex flex-wrap justify-center sm:flex-row sm:justify-between items-center gap-4">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors sm:mr-8"> {/* Removed mr-8 on small screens */}
+        <Link href="/" className="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors sm:mr-8">
           <Image
             src="/logo.png"
             alt="CineHub Logo"
@@ -110,7 +116,7 @@ const Header: React.FC = () => {
         </Link>
 
         {/* Left Filters */}
-        <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2 sm:flex-nowrap sm:space-x-6 sm:flex-1"> {/* Adjusted for responsiveness */}
+        <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2 sm:flex-nowrap sm:space-x-6 sm:flex-1">
           <button
             onClick={() => handleFilterClick("all")}
             className="hover:text-red-400 transition-colors font-medium"
@@ -150,16 +156,18 @@ const Header: React.FC = () => {
         </nav>
 
         {/* Search Bar and Profile */}
-        <div className="flex items-center gap-6 mt-4 sm:mt-0 w-full sm:w-auto justify-center"> {/* Adjusted for responsiveness */}
+        <div className="flex items-center gap-6 mt-4 sm:mt-0 w-full sm:w-auto justify-center">
           {/* Search Input with integrated icon and suggestions */}
-          <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-auto" ref={searchInputRef}> {/* Adjusted for responsiveness */}
+          <form onSubmit={handleSearchSubmit} className="relative"> {/* Removed ref={searchInputRef} from form */}
             <input
               id="search-input"
               type="text"
               value={searchQuery}
               onChange={handleInputChange}
               placeholder="Rechercher un film..."
-              className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-full sm:w-64 md:w-80" // Adjusted for responsiveness
+              className="p-2 pr-10 rounded-md bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 w-full sm:w-64 md:w-80"
+              ref={searchInputRef} // Added ref to the input element
+              onFocus={() => searchQuery.trim().length > 2 && suggestions.length > 0 && setShowSuggestions(true)} // Show suggestions on focus if query exists
             />
             <button
               type="submit"
@@ -183,7 +191,7 @@ const Header: React.FC = () => {
 
             {/* Suggestions Dropdown */}
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
+              <div id="suggestions-dropdown" className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
                 {suggestions.map((suggestion) => (
                   <div
                     key={suggestion.id}

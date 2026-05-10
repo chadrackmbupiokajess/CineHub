@@ -28,7 +28,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ item }) => {
   const displayTitle = item.title || item.name;
   const mediaTypePath = item.media_type === "tv" ? "tv" : "movies";
   const releaseDate = item.release_date || item.first_air_date || null;
-  
+
   // Format date as "Mercredi, 30/03/2025"
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A";
@@ -56,18 +56,18 @@ const MovieCard: React.FC<MovieCardProps> = ({ item }) => {
           className="rounded-t-lg"
         />
       </div>
-      
+
       {/* Contenu */}
       <div className="p-3 flex-1 flex flex-col">
         {/* Titre */}
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">{displayTitle}</h2>
-        
+
         {/* Description */}
         <p className="text-gray-600 dark:text-gray-400 text-xs line-clamp-2 mb-2">{truncatedOverview}</p>
-        
+
         {/* Date */}
         <p className="text-gray-600 dark:text-gray-400 text-xs mb-3 font-bold">{formatDate(releaseDate)}</p>
-        
+
         {/* Note */}
         <div className="mt-auto">
           <p className="text-yellow-500 dark:text-yellow-400 text-xs font-semibold">

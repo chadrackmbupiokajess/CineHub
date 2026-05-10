@@ -1,14 +1,16 @@
-"use client"; // This MUST be the very first line of the file.
-
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { usePathname } from "next/navigation";
+import ClientLayoutWrapper from "./ClientLayoutWrapper"; // Import the client wrapper
 
-// Metadata cannot be exported from a client component.
-// If you need specific metadata for this layout, you'd define it in a parent server layout
-// or directly in page.tsx files.
+// Metadata is now defined in the server layout
+export const metadata: Metadata = {
+  title: "CineHub - Votre destination film",
+  description: "Découvrez et explorez des films avec CineHub, propulsé par TMDb.",
+  icons: {
+    icon: "/logo.png", // Favicon
+  },
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,21 +27,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const isWatchPage = pathname.startsWith("/watch/");
-
   return (
     <html
       lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-gray-100 text-gray-900">
-        {!isWatchPage && <Header />}
-        <main className={`flex-1 ${!isWatchPage ? 'pt-16' : ''}`}> {/* Added pt-16 conditionally */}
-          {children}
-        </main>
-        {!isWatchPage && <Footer />}
-      </body>
+      <ClientLayoutWrapper>
+        {children}
+      </ClientLayoutWrapper>
     </html>
   );
 }
