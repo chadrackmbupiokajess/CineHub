@@ -46,7 +46,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-gray-900 text-white p-4 shadow-md">
+    <header className="fixed top-0 w-full bg-gray-900 text-white p-4 shadow-md z-50"> {/* Added fixed, top-0, w-full, z-50 */}
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-red-500 hover:text-red-400 transition-colors mr-8">
