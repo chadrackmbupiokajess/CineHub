@@ -4,6 +4,9 @@ import Link from "next/link";
 import MovieCard from "../../../components/MovieCard";
 import TrailerPlayer from "../../../components/TrailerPlayer";
 import MovieTrailerSection from "../../../components/MovieTrailerSection";
+import LogoOverlay from "../../../components/LogoOverlay";
+
+// Removed "use client"; directive
 
 interface MovieDetailsPageProps {
   params: Promise<{
@@ -16,6 +19,8 @@ interface MovieDetailsPageProps {
 export default async function MovieDetailsPage({ params: rawParams }: MovieDetailsPageProps) {
   const params = await Promise.resolve(rawParams);
   const movieId = parseInt(params.id);
+
+  // Removed showLogo state and useEffect
 
   const [movie, credits, videos, similarMoviesData] = await Promise.all([
     getMovieDetails(movieId),
@@ -47,7 +52,6 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
   const otherTrailers = backgroundTrailer ? [] : allTrailers.slice(0, 1);
 
-  // Safely access similarMoviesData.results
   const similarMovies = similarMoviesData?.results?.slice(0, 4) || [];
 
   return (
@@ -61,14 +65,11 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
       {/* Main Movie Details Section - This will be full width */}
       <div className="relative mb-8 overflow-hidden bg-white dark:bg-gray-800">
-        {/* MovieTrailerSection handles background trailer for desktop and regular trailer for mobile */}
-        <MovieTrailerSection allTrailers={allTrailers} />
-
         {/* Content Overlay - to ensure text is readable over background trailer */}
         {/* This div will contain the poster and text details */}
-        <div className="relative z-20 flex flex-col md:flex-row gap-8 p-4 md:p-8">
+        <div className="relative z-20 flex flex-col md:flex-row gap-0"> {/* Removed p-4 md:p-8 here */}
           {/* Poster Image */}
-          <div className="w-full md:w-1/3 flex-shrink-0">
+          <div className="w-full md:w-[30%] flex-shrink-0 p-4 md:p-8"> {/* Added p-4 md:p-8 here */}
             <Image
               src={imageUrl}
               alt={movie.title}
@@ -79,37 +80,46 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
             />
           </div>
           {/* Text Details */}
-          <div className="w-full md:w-2/3 text-white">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">{movie.title}</h1>
-            <p className="text-white text-base md:text-lg mb-4">{movie.overview}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              <p><strong>Note:</strong> {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"} / 10 ({movie.vote_count} votes)</p>
-              <p><strong>Date de sortie:</strong> {movie.release_date}</p>
-              <p><strong>Durée:</strong> {movie.runtime ? `${movie.runtime} min` : "N/A"}</p>
-              <p><strong>Genres:</strong> {movie.genres?.map((genre: any) => genre.name).join(", ") || "N/A"}</p>
-            </div>
+          <div className="w-full md:w-[70%] text-gray-900 md:text-white relative">
+            {/* MovieTrailerSection handles background trailer for desktop and regular trailer for mobile */}
+            {/* It will now be background for this 70% width div */}
+            <MovieTrailerSection allTrailers={allTrailers} backgroundVideoDelay={4000} />
 
-            {/* Watch Full Movie Button */}
-            <Link href={`/watch/${movieId}`} className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition-colors duration-200 shadow-lg mt-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-              </svg>
-              Voir le film complet
-            </Link>
+            {/* Logo Overlay */}
+            <LogoOverlay src="/logo.png" alt="CineHub Logo" width={200} height={60} delay={3000} />
 
-            {/* Casting */}
-            {credits.cast && credits.cast.length > 0 && (
-              <div className="mt-6">
-                <h2 className="text-xl md:text-2xl font-bold mb-3">Casting</h2>
-                <div className="flex flex-wrap gap-2">
-                  {credits.cast.slice(0, 5).map((person: any) => (
-                    <span key={person.cast_id} className="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-sm">
-                      {person.name} ({person.character})
-                    </span>
-                  ))}
-                </div>
+            <div className="relative z-20 p-4"> {/* Adjusted padding, text-white is inherited */}
+              <h1 className="text-3xl md:text-4xl font-bold mb-4">{movie.title}</h1>
+              <p className="text-gray-700 md:text-white text-base md:text-lg mb-4">{movie.overview}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-gray-900 md:text-white">
+                <p><strong>Note:</strong> {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"} / 10 ({movie.vote_count} votes)</p>
+                <p><strong>Date de sortie:</strong> {movie.release_date}</p>
+                <p><strong>Durée:</strong> {movie.runtime ? `${movie.runtime} min` : "N/A"}</p>
+                <p><strong>Genres:</strong> {movie.genres?.map((genre: any) => genre.name).join(", ") || "N/A"}</p>
               </div>
-            )}
+
+              {/* Watch Full Movie Button */}
+              <Link href={`/watch/${movieId}`} className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition-colors duration-200 shadow-lg mt-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                </svg>
+                Voir le film complet
+              </Link>
+
+              {/* Casting */}
+              {credits.cast && credits.cast.length > 0 && (
+                <div className="mt-6">
+                  <h2 className="text-xl md:text-2xl font-bold mb-3">Casting</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {credits.cast.slice(0, 5).map((person: any) => (
+                      <span key={person.cast_id} className="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-sm">
+                        {person.name} ({person.character})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

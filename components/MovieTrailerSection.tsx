@@ -5,30 +5,25 @@ import TrailerPlayer from './TrailerPlayer';
 
 interface MovieTrailerSectionProps {
   allTrailers: any[]; // Array of all YouTube trailers
+  backgroundVideoDelay?: number; // New prop for background video delay
 }
 
-const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers }) => {
+const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers, backgroundVideoDelay = 4000 }) => { // Default to 4000ms
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
-      // Define your mobile breakpoint, e.g., 768px for md breakpoint in Tailwind
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 768); // md breakpoint
     };
 
-    checkMobile(); // Check on mount
-    window.addEventListener('resize', checkMobile); // Check on resize
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const backgroundTrailer = allTrailers.length > 0 ? allTrailers[0] : null;
-  // If there's a background trailer, the "other" trailers start from the second one.
-  // If no background trailer, all trailers are considered "other".
   const regularTrailers = backgroundTrailer ? allTrailers.slice(1) : allTrailers;
-
-  // On mobile, if there was a background trailer, we'll show it as a regular trailer.
-  // We'll only show the first available trailer in a dedicated section.
   const trailerToDisplayOnMobile = backgroundTrailer || regularTrailers.length > 0 ? (backgroundTrailer || regularTrailers[0]) : null;
 
 
@@ -41,6 +36,7 @@ const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers }
             videoKey={backgroundTrailer.key}
             title={backgroundTrailer.name}
             isBackground={true}
+            delay={backgroundVideoDelay} // Pass the delay here
           />
           {/* Overlay for text readability */}
           <div className="absolute inset-0 bg-black opacity-50 rounded-lg"></div>
