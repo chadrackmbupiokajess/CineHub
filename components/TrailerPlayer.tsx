@@ -10,10 +10,10 @@ interface TrailerPlayerProps {
 }
 
 const TrailerPlayer: React.FC<TrailerPlayerProps> = ({ videoKey, title, delay = 3000, isBackground = false }) => {
-  const initialEmbedUrl = `https://www.youtube.com/embed/${videoKey}?controls=0&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1`;
+  const initialEmbedUrl = `https://www.youtube.com/embed/${videoKey}?controls=0&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&fs=0`;
 
   // Initialize src directly if it's a background video, otherwise start empty
-  const [src, setSrc] = useState(isBackground ? `${initialEmbedUrl}&autoplay=1&loop=1&playlist=${videoKey}` : "");
+  const [src, setSrc] = useState(isBackground ? `${initialEmbedUrl}&autoplay=1&loop=1&playlist=${videoKey}&start=0` : "");
   const [iframeOpacity, setIframeOpacity] = useState(isBackground ? 0 : 1);
 
   useEffect(() => {

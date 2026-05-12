@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import TrailerPlayer from './TrailerPlayer';
+import Image from 'next/image';
 
 interface MovieTrailerSectionProps {
   allTrailers: any[]; // Array of all YouTube trailers
@@ -10,6 +11,8 @@ interface MovieTrailerSectionProps {
 
 const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers, backgroundVideoDelay = 4000 }) => { // Default to 4000ms
   const [isMobile, setIsMobile] = useState(false);
+  const [showLogoOverlay, setShowLogoOverlay] = useState(true);
+  const [logoOpacity, setLogoOpacity] = useState(1);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -21,6 +24,25 @@ const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers, 
 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (!isMobile && allTrailers.length > 0) {
+      // After 6 seconds, start fading out the logo and overlay
+      const fadeTimer = setTimeout(() => {
+        setLogoOpacity(0);
+      }, 6000);
+
+      // After fade completes (6s + 1s transition), hide the overlay
+      const hideTimer = setTimeout(() => {
+        setShowLogoOverlay(false);
+      }, 7000);
+
+      return () => {
+        clearTimeout(fadeTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [isMobile, allTrailers.length]);
 
   const backgroundTrailer = allTrailers.length > 0 ? allTrailers[0] : null;
   const regularTrailers = backgroundTrailer ? allTrailers.slice(1) : allTrailers;
@@ -38,6 +60,23 @@ const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers, 
             isBackground={true}
             delay={backgroundVideoDelay} // Pass the delay here
           />
+          
+          {/* Logo Overlay with Black Background */}
+          {showLogoOverlay && (
+            <div 
+              className="absolute inset-0 bg-black flex items-center justify-center rounded-lg transition-opacity duration-1000"
+              style={{ opacity: logoOpacity }}
+            >
+              <Image
+                src="/logo.png"
+                alt="CineHub Logo"
+                width={200}
+                height={60}
+                className="opacity-100"
+              />
+            </div>
+          )}
+
           {/* Overlay for text readability */}
           <div className="absolute inset-0 bg-black opacity-50 rounded-lg"></div>
         </div>
