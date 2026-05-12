@@ -26,8 +26,8 @@ const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers, 
   }, []);
 
   useEffect(() => {
-    if (!isMobile && allTrailers.length > 0) {
-      // After 6 seconds, start fading out the logo and overlay
+    if (allTrailers.length > 0) {
+      // After 6 seconds, start fading out the logo and overlay (both desktop and mobile)
       const fadeTimer = setTimeout(() => {
         setLogoOpacity(0);
       }, 6000);
@@ -42,7 +42,7 @@ const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers, 
         clearTimeout(hideTimer);
       };
     }
-  }, [isMobile, allTrailers.length]);
+  }, [allTrailers.length]);
 
   const backgroundTrailer = allTrailers.length > 0 ? allTrailers[0] : null;
   const regularTrailers = backgroundTrailer ? allTrailers.slice(1) : allTrailers;
@@ -87,12 +87,30 @@ const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers, 
         <div className="mt-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Bande-annonce</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <TrailerPlayer
-              key={trailerToDisplayOnMobile.key}
-              videoKey={trailerToDisplayOnMobile.key}
-              title={trailerToDisplayOnMobile.name}
-              delay={0} // No delay for regular trailers
-            />
+            <div className="relative">
+              <TrailerPlayer
+                key={trailerToDisplayOnMobile.key}
+                videoKey={trailerToDisplayOnMobile.key}
+                title={trailerToDisplayOnMobile.name}
+                delay={0} // No delay for regular trailers
+              />
+              
+              {/* Logo Overlay with Black Background (Mobile) */}
+              {showLogoOverlay && isMobile && (
+                <div 
+                  className="absolute inset-0 bg-black flex items-center justify-center rounded-lg transition-opacity duration-1000"
+                  style={{ opacity: logoOpacity }}
+                >
+                  <Image
+                    src="/logo.png"
+                    alt="CineHub Logo"
+                    width={200}
+                    height={60}
+                    className="opacity-100"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
