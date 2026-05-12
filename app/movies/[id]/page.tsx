@@ -5,6 +5,7 @@ import MovieCard from "../../../components/MovieCard";
 import TrailerPlayer from "../../../components/TrailerPlayer";
 import MovieTrailerSection from "../../../components/MovieTrailerSection";
 import LogoOverlay from "../../../components/LogoOverlay";
+import FavoriteButton from "../../../components/FavoriteButton"; // Import the new component
 
 // Removed "use client"; directive
 
@@ -115,13 +116,19 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
                 )}
               </div>
 
-              {/* Watch Full Movie Button */}
-              <Link href={`/watch/${movieId}`} className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition-colors duration-200 shadow-lg mt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                </svg>
-                Voir le film complet
-              </Link>
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-4 mt-4">
+                {/* Watch Full Movie Button */}
+                <Link href={`/watch/${movieId}`} className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition-colors duration-200 shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                  </svg>
+                  Voir le film complet
+                </Link>
+
+                {/* Favorite Button */}
+                <FavoriteButton movieId={movieId} movieTitle={movie.title} />
+              </div>
 
               {/* Casting */}
               {credits.cast && credits.cast.length > 0 && (
