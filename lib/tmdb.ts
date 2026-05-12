@@ -54,6 +54,10 @@ export async function getMovieVideos(id: number) {
   return fetchMovies(`/movie/${id}/videos`);
 }
 
+export async function getMovieImages(id: number) {
+  return fetchMovies(`/movie/${id}/images`);
+}
+
 export async function getSimilarMovies(id: number) {
   return fetchMovies(`/movie/${id}/similar`);
 }

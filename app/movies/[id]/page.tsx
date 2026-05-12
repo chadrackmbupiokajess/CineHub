@@ -1,4 +1,4 @@
-import { getMovieDetails, getMovieCredits, getMovieVideos, getSimilarMovies } from "../../../lib/tmdb";
+import { getMovieDetails, getMovieCredits, getMovieVideos, getSimilarMovies, getMovieImages } from "../../../lib/tmdb";
 import Image from "next/image";
 import Link from "next/link";
 import MovieCard from "../../../components/MovieCard";
@@ -22,11 +22,12 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
 
   // Removed showLogo state and useEffect
 
-  const [movie, credits, videos, similarMoviesData] = await Promise.all([
+  const [movie, credits, videos, similarMoviesData, movieImages] = await Promise.all([
     getMovieDetails(movieId),
     getMovieCredits(movieId),
     getMovieVideos(movieId),
     getSimilarMovies(movieId),
+    getMovieImages(movieId), // Fetch movie images
   ]);
 
   if (!movie) {
@@ -53,6 +54,12 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
   const otherTrailers = backgroundTrailer ? [] : allTrailers.slice(0, 1);
 
   const similarMovies = similarMoviesData?.results?.slice(0, 4) || [];
+
+  // Extract director
+  const director = credits.crew?.find((person: any) => person.job === "Director");
+
+  // Get a few backdrops for the gallery
+  const galleryImages = movieImages.backdrops?.slice(0, 6) || []; // Limit to 6 images for now
 
   return (
     <div className="pt-20 md:pt-8">
@@ -96,6 +103,16 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
                 <p><strong>Date de sortie:</strong> {movie.release_date}</p>
                 <p><strong>Durée:</strong> {movie.runtime ? `${movie.runtime} min` : "N/A"}</p>
                 <p><strong>Genres:</strong> {movie.genres?.map((genre: any) => genre.name).join(", ") || "N/A"}</p>
+                {director && <p><strong>Réalisateur:</strong> {director.name}</p>}
+                {movie.spoken_languages && movie.spoken_languages.length > 0 && (
+                  <p><strong>Langue:</strong> {movie.spoken_languages.map((lang: any) => lang.name).join(", ")}</p>
+                )}
+                {movie.production_countries && movie.production_countries.length > 0 && (
+                  <p><strong>Pays de production:</strong> {movie.production_countries.map((country: any) => country.name).join(", ")}</p>
+                )}
+                {movie.production_companies && movie.production_companies.length > 0 && (
+                  <p><strong>Studio:</strong> {movie.production_companies.map((company: any) => company.name).join(", ")}</p>
+                )}
               </div>
 
               {/* Watch Full Movie Button */}
@@ -123,6 +140,27 @@ export default async function MovieDetailsPage({ params: rawParams }: MovieDetai
           </div>
         </div>
       </div>
+
+      {/* Movie Image Gallery */}
+      {galleryImages.length > 0 && (
+        <div className="container mx-auto px-4 md:px-8 mt-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Galerie d'images</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {galleryImages.map((image: any, index: number) => (
+              <div key={index} className="relative w-full h-48 sm:h-56 lg:h-64 overflow-hidden rounded-lg shadow-md">
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
+                  alt={`Image de ${movie.title} ${index + 1}`}
+                  fill
+                  style={{ objectFit: "cover" }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="transition-transform duration-300 hover:scale-105"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Other Trailers (if any) */}
       {otherTrailers.length > 0 && (
