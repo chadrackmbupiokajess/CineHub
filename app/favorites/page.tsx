@@ -76,6 +76,28 @@ export default function FavoritesPage() {
     <div className="container mx-auto px-4 md:px-8 pt-20 md:pt-8">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Mes Favoris</h1>
 
+      {/* Quick Menu Links */}
+      <div className="flex flex-wrap justify-center gap-3 mb-8">
+        <Link
+          href="/favorites"
+          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium"
+        >
+          ⭐ Mes favoris
+        </Link>
+        <Link
+          href="/profile"
+          className="px-4 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors font-medium"
+        >
+          👤 Mon profil
+        </Link>
+        <Link
+          href="/about"
+          className="px-4 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors font-medium"
+        >
+          ℹ️ À propos
+        </Link>
+      </div>
+
       {favoriteMovies.length === 0 ? (
         <div className="text-center text-lg text-gray-600 dark:text-gray-400 mt-10">
           <p>Vous n'avez pas encore ajouté de films à vos favoris.</p>

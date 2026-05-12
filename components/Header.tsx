@@ -11,9 +11,11 @@ const Header: React.FC = () => {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const avatarMenuRef = useRef<HTMLDivElement>(null);
 
   // Debounce logic for fetching suggestions
   useEffect(() => {
@@ -73,6 +75,11 @@ const Header: React.FC = () => {
         }
         setShowSuggestions(false);
       }
+      
+      // Close avatar menu when clicking outside
+      if (avatarMenuRef.current && !avatarMenuRef.current.contains(event.target as Node)) {
+        setAvatarMenuOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -96,6 +103,20 @@ const Header: React.FC = () => {
     }
     setShowSuggestions(false);
     setMenuOpen(false);
+  };
+
+  const handleAvatarMenuClick = (action: string) => {
+    setAvatarMenuOpen(false);
+    if (action === "favorites") {
+      router.push("/favorites");
+    } else if (action === "profile") {
+      router.push("/profile");
+    } else if (action === "logout") {
+      // TODO: Implement logout logic
+      console.log("Logout clicked");
+    } else if (action === "about") {
+      router.push("/about");
+    }
   };
 
   return (
@@ -205,16 +226,89 @@ const Header: React.FC = () => {
             </form>
 
             {/* Avatar (Desktop Only) */}
-            <div className="hidden lg:flex w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors cursor-pointer items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-lg">👤</span>
+            <div 
+              className="hidden lg:flex relative" 
+              ref={avatarMenuRef}
+            >
+              <button
+                onClick={() => setAvatarMenuOpen(!avatarMenuOpen)}
+                className="w-10 h-10 rounded-full bg-gray-700 cursor-pointer flex items-center justify-center flex-shrink-0"
+              >
+                <span className="text-white font-bold text-lg">👤</span>
+              </button>
+
+              {/* Avatar Dropdown Menu */}
+              {avatarMenuOpen && (
+                <div className="absolute right-0 mt-12 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
+                  <button
+                    onClick={() => handleAvatarMenuClick("favorites")}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-700 text-white transition-colors font-medium"
+                  >
+                    ⭐ Mes favoris
+                  </button>
+                  <button
+                    onClick={() => handleAvatarMenuClick("profile")}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-700 text-white transition-colors font-medium border-t border-gray-700"
+                  >
+                    👤 Mon profil
+                  </button>
+                  <button
+                    onClick={() => handleAvatarMenuClick("about")}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-700 text-white transition-colors font-medium border-t border-gray-700"
+                  >
+                    ℹ️ À propos
+                  </button>
+                  <button
+                    onClick={() => handleAvatarMenuClick("logout")}
+                    className="w-full text-left px-4 py-3 hover:bg-red-600 text-white transition-colors font-medium border-t border-gray-700"
+                  >
+                    🚪 Déconnexion
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Hamburger Menu + Avatar (Mobile/Tablet) - RIGHT */}
           <div className="lg:hidden flex items-center gap-2">
-            {/* Avatar */}
-            <div className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors cursor-pointer flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-lg">👤</span>
+            {/* Avatar with Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setAvatarMenuOpen(!avatarMenuOpen)}
+                className="w-10 h-10 rounded-full bg-gray-700 cursor-pointer flex items-center justify-center flex-shrink-0"
+              >
+                <span className="text-white font-bold text-lg">👤</span>
+              </button>
+
+              {/* Avatar Dropdown Menu (Mobile) */}
+              {avatarMenuOpen && (
+                <div className="absolute right-0 mt-10 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50">
+                  <button
+                    onClick={() => handleAvatarMenuClick("favorites")}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-700 text-white transition-colors font-medium"
+                  >
+                    ⭐ Mes favoris
+                  </button>
+                  <button
+                    onClick={() => handleAvatarMenuClick("profile")}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-700 text-white transition-colors font-medium border-t border-gray-700"
+                  >
+                    👤 Mon profil
+                  </button>
+                  <button
+                    onClick={() => handleAvatarMenuClick("about")}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-700 text-white transition-colors font-medium border-t border-gray-700"
+                  >
+                    ℹ️ À propos
+                  </button>
+                  <button
+                    onClick={() => handleAvatarMenuClick("logout")}
+                    className="w-full text-left px-4 py-3 hover:bg-red-600 text-white transition-colors font-medium border-t border-gray-700"
+                  >
+                    🚪 Déconnexion
+                  </button>
+                </div>
+              )}
             </div>
             
             {/* Hamburger Button */}
