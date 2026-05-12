@@ -88,17 +88,19 @@ const MovieTrailerSection: React.FC<MovieTrailerSectionProps> = ({ allTrailers, 
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Bande-annonce</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
-              <TrailerPlayer
-                key={trailerToDisplayOnMobile.key}
-                videoKey={trailerToDisplayOnMobile.key}
-                title={trailerToDisplayOnMobile.name}
-                delay={0} // No delay for regular trailers
-              />
+              <div className={isMobile ? "pointer-events-none" : ""}>
+                <TrailerPlayer
+                  key={trailerToDisplayOnMobile.key}
+                  videoKey={trailerToDisplayOnMobile.key}
+                  title={trailerToDisplayOnMobile.name}
+                  delay={0} // No delay for regular trailers
+                />
+              </div>
               
               {/* Logo Overlay with Black Background (Mobile) */}
               {showLogoOverlay && isMobile && (
                 <div 
-                  className="absolute inset-0 bg-black flex items-center justify-center rounded-lg transition-opacity duration-1000"
+                  className="absolute inset-0 bg-black flex items-center justify-center rounded-lg transition-opacity duration-1000 pointer-events-none"
                   style={{ opacity: logoOpacity }}
                 >
                   <Image
