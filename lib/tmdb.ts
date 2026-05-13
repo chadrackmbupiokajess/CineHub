@@ -108,3 +108,24 @@ export async function getMoviesByGenre(genreId: number, page: number = 1) {
 export async function getTvShowsByGenre(genreId: number, page: number = 1) {
   return fetchMovies("/discover/tv", { with_genres: genreId.toString(), page: page.toString() });
 }
+
+// TV Show functions
+export async function getTvDetails(id: number) {
+  return fetchMovies(`/tv/${id}`);
+}
+
+export async function getTvCredits(id: number) {
+  return fetchMovies(`/tv/${id}/credits`);
+}
+
+export async function getTvVideos(id: number) {
+  return fetchMovies(`/tv/${id}/videos`);
+}
+
+export async function getTvImages(id: number) {
+  return fetchMovies(`/tv/${id}/images`);
+}
+
+export async function getSimilarTvShows(id: number) {
+  return fetchMovies(`/tv/${id}/similar`);
+}

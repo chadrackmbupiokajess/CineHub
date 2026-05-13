@@ -40,7 +40,10 @@ const SearchResultsClient: React.FC<SearchResultsClientProps> = ({ initialQuery,
 
     try {
       const data = await searchMovies(currentQuery, pageNum, initialGenreId, initialYear);
-      const newResults = data.results || [];
+      const newResults = (data.results || []).map((item: any) => ({
+        ...item,
+        media_type: item.media_type || 'movie' // Preserve media_type from API or default to movie
+      }));
 
       if (isLoadMore) {
         setResults(prev => [...prev, ...newResults]);

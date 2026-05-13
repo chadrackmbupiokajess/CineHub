@@ -19,32 +19,32 @@ export default async function Home({ searchParams }: HomePageProps) {
     showHero = false; // Hide hero if a filter is active
     switch (filterType) {
       case "movie":
-        displayItems = (await getPopularMovies()).results;
+        displayItems = (await getPopularMovies()).results.map((item: any) => ({...item, media_type: 'movie'}));
         sectionTitle = "Films Populaires";
         break;
       case "tv":
-        displayItems = (await getPopularTvShows()).results;
+        displayItems = (await getPopularTvShows()).results.map((item: any) => ({...item, media_type: 'tv'}));
         sectionTitle = "Séries Populaires";
         break;
       case "new":
-        displayItems = (await getUpcomingMovies()).results;
+        displayItems = (await getUpcomingMovies()).results.map((item: any) => ({...item, media_type: 'movie'}));
         sectionTitle = "Nouveautés (Films à venir)";
         break;
       case "documentary":
         // TMDb genre ID for Documentary is typically 99 for movies
-        displayItems = (await getMoviesByGenre(99)).results;
+        displayItems = (await getMoviesByGenre(99)).results.map((item: any) => ({...item, media_type: 'movie'}));
         sectionTitle = "Documentaires";
         break;
       default:
         // Fallback to popular movies if an unknown filter is provided
-        displayItems = (await getPopularMovies()).results;
+        displayItems = (await getPopularMovies()).results.map((item: any) => ({...item, media_type: 'movie'}));
         sectionTitle = "Films Populaires";
         showHero = true; // If filter is invalid, show hero
         break;
     }
   } else {
     // No filter, show popular movies and hero
-    displayItems = (await getPopularMovies()).results;
+    displayItems = (await getPopularMovies()).results.map((item: any) => ({...item, media_type: 'movie'}));
   }
 
   const trendingItems = await getTrending("all", "week"); // Always fetch trending for hero, but only display if showHero is true

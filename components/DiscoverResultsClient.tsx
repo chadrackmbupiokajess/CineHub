@@ -37,7 +37,10 @@ const DiscoverResultsClient: React.FC<DiscoverResultsClientProps> = ({ initialGe
 
     try {
       const data = await discoverMovies(pageNum, initialGenreId, initialYear);
-      const newResults = data.results || [];
+      const newResults = (data.results || []).map((item: any) => ({
+        ...item,
+        media_type: 'movie' // DiscoverMovies only returns movies
+      }));
 
       if (isLoadMore) {
         setResults(prev => [...prev, ...newResults]);
