@@ -126,12 +126,17 @@ const Header: React.FC = () => {
         }
         setShowSuggestions(false);
       }
-      
+
       if (avatarMenuRef.current && !avatarMenuRef.current.contains(event.target as Node)) {
         setAvatarMenuOpen(false);
       }
 
       if (filterMenuRef.current && !filterMenuRef.current.contains(event.target as Node)) {
+        // Don't close if clicking on the filter button itself
+        const target = event.target as HTMLElement;
+        if (target.closest('button[aria-label="Ouvrir les filtres"]')) {
+          return;
+        }
         setShowFilterMenu(false);
       }
     };

@@ -1,13 +1,17 @@
 import DiscoverResultsClient from "../../components/DiscoverResultsClient"; // Import the client component
 
 interface DiscoverPageProps {
-  searchParams: {
+  searchParams: Promise<{
+    genre?: string;
+    year?: string;
+  }> | {
     genre?: string;
     year?: string;
   };
 }
 
-export default async function DiscoverPage({ searchParams }: DiscoverPageProps) {
+export default async function DiscoverPage({ searchParams: rawSearchParams }: DiscoverPageProps) {
+  const searchParams = await Promise.resolve(rawSearchParams);
   const genreId = searchParams.genre || '';
   const year = searchParams.year || '';
 
