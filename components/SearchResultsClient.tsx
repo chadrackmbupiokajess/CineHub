@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import MovieCard from "./MovieCard";
 import { searchMovies } from "../lib/tmdb"; // Only searchMovies is needed here
 
@@ -13,36 +13,88 @@ interface SearchResultsClientProps {
 const SearchResultsClient: React.FC<SearchResultsClientProps> = ({ initialQuery, initialGenreId, initialYear }) => {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Effect to fetch search results with filters
-  useEffect(() => {
-    const fetchResults = async () => {
-      const currentQuery = initialQuery.trim();
+  const fetchResults = useCallback(async (pageNum: number, isLoadMore: boolean = false) => {
+    const currentQuery = initialQuery.trim();
 
-      // If no query and no filters, show no results
-      if (!currentQuery && !initialGenreId && !initialYear) {
-        setResults([]);
-        setLoading(false);
-        return;
+    // If no query and no filters, show no results
+    if (!currentQuery && !initialGenreId && !initialYear) {
+      setResults([]);
+      setLoading(false);
+      setHasMore(false);
+      return;
+    }
+
+    if (isLoadMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
+    setError(null);
+
+    try {
+      const data = await searchMovies(currentQuery, pageNum, initialGenreId, initialYear);
+      const newResults = data.results || [];
+
+      if (isLoadMore) {
+        setResults(prev => [...prev, ...newResults]);
+      } else {
+        setResults(newResults);
       }
 
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await searchMovies(currentQuery, 1, initialGenreId, initialYear);
-        setResults(data.results);
-      } catch (err: any) {
-        console.error("Error fetching search results:", err);
-        setError("Impossible de charger les résultats de recherche. Veuillez réessayer.");
+      // Check if there are more pages
+      setHasMore(newResults.length > 0 && data.page < data.total_pages);
+    } catch (err: any) {
+      console.error("Error fetching search results:", err);
+      setError("Impossible de charger les résultats de recherche. Veuillez réessayer.");
+      if (!isLoadMore) {
         setResults([]);
-      } finally {
-        setLoading(false);
+      }
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [initialQuery, initialGenreId, initialYear]);
+
+  // Initial fetch
+  useEffect(() => {
+    setPage(1);
+    setResults([]);
+    setHasMore(true);
+    fetchResults(1, false);
+  }, [initialQuery, initialGenreId, initialYear, fetchResults]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
+          const nextPage = page + 1;
+          setPage(nextPage);
+          fetchResults(nextPage, true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    observerRef.current = observer;
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
     };
-
-    fetchResults();
-  }, [initialQuery, initialGenreId, initialYear]); // Re-fetch when query or filters change
+  }, [hasMore, loading, loadingMore, page, fetchResults]);
 
   if (loading) {
     return <p className="text-center text-lg text-gray-600 dark:text-gray-400">Chargement des résultats...</p>;
@@ -61,11 +113,18 @@ const SearchResultsClient: React.FC<SearchResultsClientProps> = ({ initialQuery,
           Aucun film trouvé pour votre recherche avec les filtres appliqués.
         </p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {results.map((item: any) => (
-            <MovieCard key={item.id} item={item} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {results.map((item: any) => (
+              <MovieCard key={`${item.id}-${page}`} item={item} />
+            ))}
+          </div>
+          {hasMore && (
+            <div ref={loadMoreRef} className="text-center py-8">
+              {loadingMore && <p className="text-lg text-gray-600 dark:text-gray-400">Chargement de plus de résultats...</p>}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
