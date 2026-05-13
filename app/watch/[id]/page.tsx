@@ -10,8 +10,17 @@ export default function WatchMoviePage() {
 
   // Removed isFullScreen state
   const [showBackButton, setShowBackButton] = useState(false); // State to control back button visibility
+  const [language, setLanguage] = useState<'vf' | 'vostfr'>('vf'); // Language selection: VF or VOSTFR
 
-  const vidsrcUrl = `https://vidsrc.me/embed/movie?tmdb=${movieId}&ds_lang=fr&autoplay=1`;
+  const getVideoUrl = () => {
+    if (language === 'vf') {
+      return `https://www.2embed.cc/embed/${movieId}`;
+    } else {
+      return `https://vidsrc.me/embed/movie?tmdb=${movieId}&ds_lang=fr&autoplay=1`;
+    }
+  };
+
+  const videoUrl = getVideoUrl();
 
   // Removed useEffect for automatic fullscreen attempt
 
@@ -22,12 +31,37 @@ export default function WatchMoviePage() {
       onMouseLeave={() => setShowBackButton(false)}
     >
       <iframe
-        src={vidsrcUrl}
+        src={videoUrl}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
         frameBorder="0"
         className="w-full h-full"
         title={`Watch movie ${movieId}`}
+        key={language} // Force re-render when language changes
       ></iframe>
+
+      {/* Language Selector */}
+      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex gap-2 z-50">
+        <button
+          onClick={() => setLanguage('vf')}
+          className={`px-4 py-2 rounded-full font-bold transition-colors duration-200 ${
+            language === 'vf'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-800 bg-opacity-75 text-gray-300 hover:bg-gray-700'
+          }`}
+        >
+          VF
+        </button>
+        <button
+          onClick={() => setLanguage('vostfr')}
+          className={`px-4 py-2 rounded-full font-bold transition-colors duration-200 ${
+            language === 'vostfr'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-800 bg-opacity-75 text-gray-300 hover:bg-gray-700'
+          }`}
+        >
+          VOSTFR
+        </button>
+      </div>
 
       {/* Back Button */}
       <button
