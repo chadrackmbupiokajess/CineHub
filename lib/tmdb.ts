@@ -62,8 +62,26 @@ export async function getSimilarMovies(id: number) {
   return fetchMovies(`/movie/${id}/similar`);
 }
 
-export async function searchMovies(query: string, page: number = 1) {
-  return fetchMovies("/search/movie", { query, page: page.toString() });
+export async function searchMovies(query: string, page: number = 1, genreId?: string, year?: string) {
+  const searchParams: Record<string, string> = { query, page: page.toString() };
+  if (genreId) {
+    searchParams.with_genres = genreId;
+  }
+  if (year) {
+    searchParams.primary_release_year = year;
+  }
+  return fetchMovies("/search/movie", searchParams);
+}
+
+export async function discoverMovies(page: number = 1, genreId?: string, year?: string) {
+  const params: Record<string, string> = { page: page.toString() };
+  if (genreId) {
+    params.with_genres = genreId;
+  }
+  if (year) {
+    params.primary_release_year = year;
+  }
+  return fetchMovies("/discover/movie", params);
 }
 
 export async function getTrending(mediaType: "all" | "movie" | "tv" = "all", timeWindow: "day" | "week" = "week") {

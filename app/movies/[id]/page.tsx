@@ -208,35 +208,32 @@ export default function MovieDetailsPage({ params: rawParams }: MovieDetailsPage
                   href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-lg"
+                  className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-lg"
                   aria-label="Partager sur Facebook"
                 >
-                  <svg fill="currentColor" className="h-5 w-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg fill="currentColor" className="h-6 w-6" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.73 9-4.72 9-9.95z" />
                   </svg>
-                  Facebook
                 </a>
                 <a
                   href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(`Découvrez ce film sur CineHub : ${movie.title}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-gray-900 text-white font-bold rounded-full hover:bg-gray-700 transition-colors duration-200 shadow-lg"
+                  className="inline-flex items-center justify-center w-12 h-12 bg-gray-900 text-white font-bold rounded-full hover:bg-gray-700 transition-colors duration-200 shadow-lg"
                   aria-label="Partager sur X (Twitter)"
                 >
-                  <svg fill="currentColor" className="h-5 w-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg fill="currentColor" className="h-6 w-6" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.873L4.925 21.75H1.613l7.393-8.467L1.33 2.25H8.03c2.572 0 4.044 1.55 5.06 3.14L18.244 2.25zm-3.826 1.834l-1.353 1.675L5.23 20.5H6.9L12.447 13.8l1.352-1.675L18.77 3.5H17.1L14.418 4.084z" />
                   </svg>
-                  X (Twitter)
                 </a>
                 <button
                   onClick={handleShareLink}
-                  className="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-bold rounded-full hover:bg-gray-600 transition-colors duration-200 shadow-lg"
+                  className="inline-flex items-center justify-center w-12 h-12 bg-gray-500 text-white font-bold rounded-full hover:bg-gray-600 transition-colors duration-200 shadow-lg"
                   aria-label="Copier le lien"
                 >
-                  <svg fill="currentColor" className="h-5 w-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg fill="currentColor" className="h-6 w-6" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
                   </svg>
-                  Copier le lien
                 </button>
               </div>
 

@@ -11,7 +11,7 @@ export default function WatchMoviePage() {
   // Removed isFullScreen state
   const [showBackButton, setShowBackButton] = useState(false); // State to control back button visibility
 
-  const vidsrcUrl = `https://vidsrc.me/embed/movie?tmdb=${movieId}`;
+  const vidsrcUrl = `https://vidsrc.me/embed/movie?tmdb=${movieId}&ds_lang=fr&autoplay=1`;
 
   // Removed useEffect for automatic fullscreen attempt
 
@@ -23,7 +23,7 @@ export default function WatchMoviePage() {
     >
       <iframe
         src={vidsrcUrl}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" // Keep fullscreen permission for manual activation
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
         frameBorder="0"
         className="w-full h-full"
         title={`Watch movie ${movieId}`}

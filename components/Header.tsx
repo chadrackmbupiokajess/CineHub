@@ -4,7 +4,12 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { searchMovies } from "../lib/tmdb"; // Import searchMovies for suggestions
+import { searchMovies, getGenres } from "../lib/tmdb"; // Import getGenres
+
+interface Genre {
+  id: number;
+  name: string;
+}
 
 const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,10 +17,29 @@ const Header: React.FC = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const [showFilterMenu, setShowFilterMenu] = useState(false); // State for filter menu visibility
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [selectedGenreId, setSelectedGenreId] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+
   const router = useRouter();
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
+  const filterMenuRef = useRef<HTMLDivElement>(null); // Ref for filter menu
+
+  // Fetch genres on component mount
+  useEffect(() => {
+    const fetchGenresData = async () => {
+      try {
+        const data = await getGenres("movie");
+        setGenres(data.genres);
+      } catch (err) {
+        console.error("Error fetching genres:", err);
+      }
+    };
+    fetchGenresData();
+  }, []);
 
   // Debounce logic for fetching suggestions
   useEffect(() => {
@@ -49,23 +73,50 @@ const Header: React.FC = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedQuery = searchQuery.trim();
+
+    const params = new URLSearchParams();
     if (trimmedQuery) {
-      router.push(`/search?query=${encodeURIComponent(trimmedQuery)}`);
-      setShowSuggestions(false);
-    } else if (pathname === '/search') {
-      router.push('/');
-      setShowSuggestions(false);
+      params.set("query", trimmedQuery);
     }
+    if (selectedGenreId) {
+      params.set("genre", selectedGenreId);
+    }
+    if (selectedYear) {
+      params.set("year", selectedYear);
+    }
+
+    const queryString = params.toString();
+
+    if (trimmedQuery) {
+      router.push(`/search?${queryString}`);
+    } else if (selectedGenreId || selectedYear) {
+      router.push(`/discover?${queryString}`);
+    } else {
+      router.push("/"); // Or some default page if nothing is selected
+    }
+
+    setShowSuggestions(false);
     setMenuOpen(false);
+    setShowFilterMenu(false); // Close filter menu after search
   };
 
   const handleSuggestionClick = (suggestionTitle: string) => {
     setSearchQuery(suggestionTitle);
-    router.push(`/search?query=${encodeURIComponent(suggestionTitle)}`);
+    const params = new URLSearchParams();
+    params.set("query", suggestionTitle);
+    if (selectedGenreId) {
+      params.set("genre", selectedGenreId);
+    }
+    if (selectedYear) {
+      params.set("year", selectedYear);
+    }
+    router.push(`/search?${params.toString()}`);
     setShowSuggestions(false);
     setMenuOpen(false);
+    setShowFilterMenu(false);
   };
 
+  // Close suggestions and menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchInputRef.current && !searchInputRef.current.contains(event.target as Node)) {
@@ -76,9 +127,12 @@ const Header: React.FC = () => {
         setShowSuggestions(false);
       }
       
-      // Close avatar menu when clicking outside
       if (avatarMenuRef.current && !avatarMenuRef.current.contains(event.target as Node)) {
         setAvatarMenuOpen(false);
+      }
+
+      if (filterMenuRef.current && !filterMenuRef.current.contains(event.target as Node)) {
+        setShowFilterMenu(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -103,6 +157,7 @@ const Header: React.FC = () => {
     }
     setShowSuggestions(false);
     setMenuOpen(false);
+    setShowFilterMenu(false);
   };
 
   const handleAvatarMenuClick = (action: string) => {
@@ -118,6 +173,17 @@ const Header: React.FC = () => {
       router.push("/about");
     }
   };
+
+  const handleGenreChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedGenreId(e.target.value);
+  };
+
+  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(e.target.value);
+  };
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 20 }, (_, i) => currentYear - i);
 
   return (
     <header className="fixed top-0 w-full bg-gray-900 text-white p-4 shadow-md z-50">
@@ -173,6 +239,61 @@ const Header: React.FC = () => {
             >
               Ma liste
             </button>
+            {/* Filter Icon for Desktop Menu */}
+            <div className="relative" ref={filterMenuRef}>
+              <button
+                onClick={() => setShowFilterMenu(!showFilterMenu)}
+                className="flex items-center p-2 rounded-full hover:bg-gray-700 transition-colors"
+                aria-label="Ouvrir les filtres"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-white"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+              {showFilterMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50 p-3">
+                  <select
+                    value={selectedGenreId}
+                    onChange={handleGenreChange}
+                    className="w-full p-2 mb-2 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="">Tous les genres</option>
+                    {genres.map((genre) => (
+                      <option key={genre.id} value={genre.id}>
+                        {genre.name}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedYear}
+                    onChange={handleYearChange}
+                    className="w-full p-2 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="">Toutes les années</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleSearchSubmit} // Use handleSearchSubmit to apply filters
+                    className="w-full mt-3 px-4 py-2 bg-red-600 text-white font-bold rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    Appliquer
+                  </button>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Center/Right Section: Search and Profile */}
@@ -271,6 +392,62 @@ const Header: React.FC = () => {
 
           {/* Hamburger Menu + Avatar (Mobile/Tablet) - RIGHT */}
           <div className="lg:hidden flex items-center gap-2">
+            {/* Filter Icon for Mobile Menu */}
+            <div className="relative" ref={filterMenuRef}>
+              <button
+                onClick={() => setShowFilterMenu(!showFilterMenu)}
+                className="flex items-center p-2 rounded-full hover:bg-gray-700 transition-colors"
+                aria-label="Ouvrir les filtres"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-white"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+              {showFilterMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-50 p-3">
+                  <select
+                    value={selectedGenreId}
+                    onChange={handleGenreChange}
+                    className="w-full p-2 mb-2 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="">Tous les genres</option>
+                    {genres.map((genre) => (
+                      <option key={genre.id} value={genre.id}>
+                        {genre.name}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedYear}
+                    onChange={handleYearChange}
+                    className="w-full p-2 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="">Toutes les années</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleSearchSubmit} // Use handleSearchSubmit to apply filters
+                    className="w-full mt-3 px-4 py-2 bg-red-600 text-white font-bold rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    Appliquer
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Avatar with Dropdown */}
             <div className="relative">
               <button
