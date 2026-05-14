@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTvDetails, getTvSeasonDetails, getTvEpisodeDetails } from "../../../../../../lib/tmdb";
+import { getTvDetails, getTvSeasonDetails, getTvEpisodeDetails } from "../../../../../../../../../../lib/tmdb";
 import Image from "next/image";
 import Link from "next/link";
 
