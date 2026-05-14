@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { getTvDetails, getTvSeasonDetails } from "../../../../../lib/tmdb";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,64 +6,40 @@ interface SeasonPageProps {
   params: Promise<{
     id: string;
     seasonNumber: string;
-  }> | {
-    id: string;
-    seasonNumber: string;
-  };
+  }>;
 }
 
-export default function SeasonPage({ params: rawParams }: SeasonPageProps) {
-  const [tvId, setTvId] = useState<number | null>(null);
-  const [seasonNumber, setSeasonNumber] = useState<number | null>(null);
-  const [tv, setTv] = useState<any>(null);
-  const [season, setSeason] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default async function SeasonPage({ params }: SeasonPageProps) {
+  const { id, seasonNumber } = await params;
+  const tvId = parseInt(id);
+  const seasonNum = parseInt(seasonNumber);
 
-  useEffect(() => {
-    const resolveParams = async () => {
-      const resolved = await Promise.resolve(rawParams);
-      setTvId(parseInt(resolved.id));
-      setSeasonNumber(parseInt(resolved.seasonNumber));
-    };
-    resolveParams();
-  }, [rawParams]);
-
-  useEffect(() => {
-    if (tvId === null || seasonNumber === null) return;
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [tvData, seasonData] = await Promise.all([
-          getTvDetails(tvId),
-          getTvSeasonDetails(tvId, seasonNumber),
-        ]);
-        setTv(tvData);
-        setSeason(seasonData);
-      } catch (err) {
-        console.error("Error fetching season details:", err);
-        setError("Impossible de charger les détails de la saison.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [tvId, seasonNumber]);
-
-  if (loading || tvId === null || seasonNumber === null) {
+  let tv, season;
+  try {
+    const [tvData, seasonData] = await Promise.all([
+      getTvDetails(tvId),
+      getTvSeasonDetails(tvId, seasonNum),
+    ]);
+    tv = tvData;
+    season = seasonData;
+  } catch (err) {
+    console.error("Error fetching season details:", err);
     return (
       <div className="container mx-auto p-4 text-center pt-20 md:pt-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Chargement...</h1>
+        <h1 className="text-3xl font-bold text-red-500">Erreur</h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400 mt-4">Impossible de charger les détails de la saison.</p>
+        <Link href={`/tv/${tvId}`} className="text-blue-500 hover:underline inline-block mt-4">
+          &larr; Retour à la série
+        </Link>
       </div>
     );
   }
 
-  if (error || !tv || !season) {
+  if (!tv || !season) {
     return (
       <div className="container mx-auto p-4 text-center pt-20 md:pt-8">
         <h1 className="text-3xl font-bold text-red-500">Erreur</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 mt-4">{error}</p>
+        <p className="text-lg text-gray-600 dark:text-gray-400 mt-4">Détails non disponibles.</p>
         <Link href={`/tv/${tvId}`} className="text-blue-500 hover:underline inline-block mt-4">
           &larr; Retour à la série
         </Link>
