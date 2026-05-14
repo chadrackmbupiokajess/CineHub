@@ -129,3 +129,12 @@ export async function getTvImages(id: number) {
 export async function getSimilarTvShows(id: number) {
   return fetchMovies(`/tv/${id}/similar`);
 }
+
+// TV Season and Episode functions
+export async function getTvSeasonDetails(tvId: number, seasonNumber: number) {
+  return fetchMovies(`/tv/${tvId}/season/${seasonNumber}`);
+}
+
+export async function getTvEpisodeDetails(tvId: number, seasonNumber: number, episodeNumber: number) {
+  return fetchMovies(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`);
+}

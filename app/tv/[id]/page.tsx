@@ -236,9 +236,44 @@ export default function TvDetailsPage({ params: rawParams }: TvDetailsPageProps)
                   <h2 className="text-xl md:text-2xl font-bold mb-3">Casting</h2>
                   <div className="flex flex-wrap gap-2">
                     {credits.cast.slice(0, 5).map((person: any) => (
-                      <span key={person.cast_id} className="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-sm">
+                      <span key={person.id || person.cast_id} className="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-sm">
                         {person.name} ({person.character})
                       </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Seasons */}
+              {tv.seasons && tv.seasons.length > 0 && (
+                <div className="mt-8">
+                  <h2 className="text-xl md:text-2xl font-bold mb-4">Saisons</h2>
+                  <div className="space-y-4">
+                    {tv.seasons.filter((season: any) => season.season_number > 0).map((season: any) => (
+                      <Link
+                        key={season.id}
+                        href={`/tv/${tvId}/season/${season.season_number}`}
+                        className="block bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition-colors duration-200"
+                      >
+                        <div className="flex items-start gap-4">
+                          {season.poster_path && (
+                            <Image
+                              src={`https://image.tmdb.org/t/p/w200${season.poster_path}`}
+                              alt={season.name}
+                              width={100}
+                              height={150}
+                              className="rounded-md flex-shrink-0"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold mb-2">{season.name}</h3>
+                            <p className="text-sm text-gray-300 mb-2">
+                              {season.episode_count} épisodes • {season.air_date ? new Date(season.air_date).getFullYear() : 'N/A'}
+                            </p>
+                            <p className="text-sm text-gray-400 line-clamp-2">{season.overview || "Aucune description disponible."}</p>
+                          </div>
+                        </div>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -254,7 +289,7 @@ export default function TvDetailsPage({ params: rawParams }: TvDetailsPageProps)
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Galerie d'images</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {galleryImages.map((image: any, index: number) => (
-              <div key={index} className="relative w-full h-48 sm:h-56 lg:h-64 overflow-hidden rounded-lg shadow-md">
+              <div key={image.file_path} className="relative w-full h-48 sm:h-56 lg:h-64 overflow-hidden rounded-lg shadow-md">
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
                   alt={`Image de ${tv.name} ${index + 1}`}
